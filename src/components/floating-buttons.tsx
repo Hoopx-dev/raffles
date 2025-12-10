@@ -8,10 +8,10 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { useEffect } from 'react';
 
 export function FloatingButtons() {
-  const { connected, publicKey, disconnect } = useWallet();
+  const { connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
   const { openInfoModal, openRedeemModal } = useUIStore();
-  const { setAddress, clearAddress, truncatedAddress } = useWalletStore();
+  const { setAddress, clearAddress } = useWalletStore();
   const { t } = useTranslation();
 
   // Sync wallet connection state
@@ -23,12 +23,20 @@ export function FloatingButtons() {
     }
   }, [connected, publicKey, setAddress, clearAddress]);
 
+  const handleButtonClick = () => {
+    if (connected) {
+      openRedeemModal();
+    } else {
+      setVisible(true);
+    }
+  };
+
   return (
     <>
       {/* Info Button */}
       <button
         onClick={openInfoModal}
-        className="fixed bottom-24 right-4 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-primary hover:bg-gray-50 transition-colors z-40 cursor-pointer"
+        className="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-primary hover:bg-gray-50 transition-colors z-40 cursor-pointer"
         aria-label="Info"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,32 +44,18 @@ export function FloatingButtons() {
         </svg>
       </button>
 
-      {/* Connect/Redeem Button */}
+      {/* Connect/Redeem Button - always show */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40">
-        <div className="flex gap-3">
-          {/* Wallet Button */}
-          <button
-            data-wallet-button
-            onClick={() => connected ? disconnect() : setVisible(true)}
-            className={`flex-1 py-4 rounded-xl font-semibold transition-all cursor-pointer ${
-              connected
-                ? 'bg-white/10 text-white border border-white/20'
-                : 'bg-primary text-white'
-            }`}
-          >
-            {connected ? truncatedAddress : t.wallet.connect}
-          </button>
-
-          {/* Redeem Button (only when connected) */}
-          {connected && (
-            <button
-              onClick={openRedeemModal}
-              className="flex-1 py-4 rounded-xl font-semibold bg-gold text-text-dark hover:brightness-110 transition-all cursor-pointer"
-            >
-              {t.wallet.redeem}
-            </button>
-          )}
-        </div>
+        <button
+          onClick={handleButtonClick}
+          className={`w-full py-4 rounded-full font-semibold transition-all cursor-pointer ${
+            connected
+              ? 'bg-gold text-text-dark hover:brightness-110'
+              : 'bg-primary text-white hover:bg-primary/90'
+          }`}
+        >
+          {connected ? t.wallet.redeem : t.wallet.connectToRedeem}
+        </button>
       </div>
     </>
   );

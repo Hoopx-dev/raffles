@@ -41,6 +41,7 @@
   },
   "wallet": {
     "connect": "连接钱包",
+    "connectToRedeem": "连接以兑换",
     "redeem": "兑换票券"
   },
   "modals": {
@@ -91,5 +92,12 @@
       "youWon": "您中了幸运号码！",
       "prize": "您赢得了10 USDT！"
     }
+  },
+  "luckyPrize": {
+    "title": "幸运号码奖金",
+    "wonAmount": "已中奖金额",
+    "claim": "领取",
+    "claimVia": "联系客服领取",
+    "noPrize": "暂无奖金"
   }
 }

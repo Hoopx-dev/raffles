@@ -8,6 +8,8 @@ export interface Ticket {
   awayScore?: number;
   timestamp?: number;
   txHash?: string;
+  isLuckyWinner?: boolean;
+  luckyNumber?: number;
 }
 
 interface TicketState {

@@ -14,6 +14,7 @@ import { RedeemModal } from '@/components/redeem-modal';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { InfoModal } from '@/components/info-modal';
 import { LuckyNumberModal } from '@/components/lucky-number-modal';
+import { LuckyPrizeBanner } from '@/components/lucky-prize-banner';
 import { Toast } from '@/components/ui/toast';
 
 // Dummy stats (will be replaced with real data from backend)
@@ -38,6 +39,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen pb-24">
+      {/* Lucky Prize Banner - fixed at top */}
+      <LuckyPrizeBanner />
+
       {/* Purple section with snow animation */}
       <div className="relative overflow-hidden bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/bg-header.png)' }}>
         {/* Snow animation covering entire purple section */}

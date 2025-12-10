@@ -1,24 +1,84 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useUIStore } from '@/lib/store/useUIStore';
+import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
 
 export function Header() {
   const { locale, setLocale } = useUIStore();
   const { t } = useTranslation();
+  const { connected, disconnect } = useWallet();
+  const { setVisible } = useWalletModal();
+  const { truncatedAddress } = useWalletStore();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleWalletClick = () => {
+    if (connected) {
+      setShowDropdown(!showDropdown);
+    } else {
+      setVisible(true);
+    }
+  };
+
+  const handleDisconnect = () => {
+    disconnect();
+    setShowDropdown(false);
+  };
 
   return (
     <header className="relative">
       {/* Content */}
       <div className="relative z-10 px-4 pt-2 pb-6">
-        {/* Language toggle */}
-        <div className="flex justify-end -mb-2">
+        {/* Top bar: Language toggle & Wallet */}
+        <div className="flex justify-end items-center gap-2 -mb-2">
+          {/* Wallet Button */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={handleWalletClick}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                connected
+                  ? 'bg-white/20 text-white hover:bg-white/30'
+                  : 'bg-primary text-white hover:bg-primary/90'
+              }`}
+            >
+              {connected ? truncatedAddress : t.wallet.connect}
+            </button>
+
+            {/* Dropdown */}
+            {showDropdown && connected && (
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[120px] z-50">
+                <button
+                  onClick={handleDisconnect}
+                  className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer"
+                >
+                  Disconnect
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Language toggle */}
           <button
             onClick={() => setLocale(locale === 'en' ? 'cn' : 'en')}
             className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors cursor-pointer"
           >
-            {locale === 'en' ? '中文' : 'EN'}
+            {locale === 'en' ? 'EN' : '中文'}
           </button>
         </div>
 

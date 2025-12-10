@@ -41,6 +41,7 @@
   },
   "wallet": {
     "connect": "Connect Wallet",
+    "connectToRedeem": "Connect to Redeem",
     "redeem": "Redeem Ticket"
   },
   "modals": {
@@ -91,5 +92,12 @@
       "youWon": "You've hit a lucky number!",
       "prize": "You won 10 USDT!"
     }
+  },
+  "luckyPrize": {
+    "title": "Lucky Number Prize",
+    "wonAmount": "Won Amount",
+    "claim": "Claim",
+    "claimVia": "Contact support to claim",
+    "noPrize": "No prize yet"
   }
 }

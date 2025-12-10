@@ -63,17 +63,22 @@ export function UnbetTicketCard({ ticket }: UnbetTicketCardProps) {
     const home = parseInt(homeScore, 10);
     const away = parseInt(awayScore, 10);
 
-    // Update ticket
+    // Check for lucky number
+    const luckyNumber = checkLuckyNumber(home, away);
+    const isLucky = luckyNumber !== null;
+
+    // Update ticket with lucky winner status
     updateTicket(ticket.id, {
       status: 'bet',
       homeScore: home,
       awayScore: away,
       timestamp: Date.now(),
+      isLuckyWinner: isLucky,
+      luckyNumber: luckyNumber ?? undefined,
     });
 
-    // Check for lucky number
-    const luckyNumber = checkLuckyNumber(home, away);
-    if (luckyNumber) {
+    // Show lucky number modal if won
+    if (isLucky) {
       setTimeout(() => {
         openLuckyNumberModal(luckyNumber);
       }, 300);
