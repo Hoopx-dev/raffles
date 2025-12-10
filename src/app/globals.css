@@ -7,13 +7,13 @@
 
 @theme inline {
   /* Brand Colors */
-  --color-primary: #DA953F;
-  --color-primary-dark: #B87A2E;
-  --color-secondary: #900008;
-  --color-gold: #DA953F;
+  --color-primary: #D99739;
+  --color-primary-dark: #183824;
+  --color-secondary: #326046;
+  --color-gold: #D99739;
   --color-orange: #FF6B35;
-  --color-success: #31D99C;
-  --color-danger: #900008;
+  --color-success: #326046;
+  --color-danger: #91000A;
 
   /* Status Colors */
   --color-live: #FF4444;
@@ -42,10 +42,10 @@
 }
 
 body {
-  background: linear-gradient(180deg, #DA953F 0%, #900008 100%);
+  background: #91000A;
   min-height: 100vh;
   color: var(--foreground);
-  accent-color: #DA953F;
+  accent-color: #D99739;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;

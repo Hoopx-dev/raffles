@@ -36,7 +36,7 @@ export function FloatingButtons() {
       {/* Info Button */}
       <button
         onClick={openInfoModal}
-        className="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-primary hover:bg-gray-50 transition-colors z-40 cursor-pointer"
+        className="fixed bottom-20 right-4 w-12 h-12 rounded-full bg-[#91000A] flex items-center justify-center text-[#D99739] hover:brightness-110 transition-colors z-40 cursor-pointer" style={{ boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)' }}
         aria-label="Info"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,13 +45,13 @@ export function FloatingButtons() {
       </button>
 
       {/* Connect/Redeem Button - always show */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40 max-w-[860px] mx-auto">
         <button
           onClick={handleButtonClick}
           className={`w-full py-4 rounded-full font-semibold uppercase text-sm transition-all cursor-pointer ${
             connected
-              ? 'bg-gold text-secondary hover:brightness-110'
-              : 'bg-primary text-secondary hover:bg-primary-dark'
+              ? 'bg-gold text-[#91000A] hover:brightness-110'
+              : 'bg-primary text-[#91000A] hover:bg-primary-dark'
           }`}
         >
           {connected ? t.wallet.redeem : t.wallet.connectToRedeem}

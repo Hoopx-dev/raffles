@@ -13,8 +13,8 @@ export function CumulativeScore({ homeTeams, awayTeams }: CumulativeScoreProps) 
 
   return (
     <div className="mx-4 mb-4">
-      <p className="text-text-muted text-sm mb-2">{t.cumulative.title}</p>
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-[#F5A623] via-[#F7B731] to-[#FF9500]">
+      <p className="text-white/60 text-sm mb-2">{t.cumulative.title}</p>
+      <div className="p-6 rounded-2xl" style={{ background: 'radial-gradient(circle at center, #326046 0%, #183824 100%)' }}>
         <div className="flex items-center justify-center gap-6">
           {/* Home Teams */}
           <div className="text-center flex-1">

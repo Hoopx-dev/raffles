@@ -24,7 +24,7 @@ export function StatsBar({ prizePool, participants }: StatsBarProps) {
       {/* Participants */}
       <div className="text-right">
         <p className="text-white/60 text-xs uppercase tracking-wide">{t.stats.participants}</p>
-        <p className="text-orange font-bold text-2xl">{formatNumber(participants)}</p>
+        <p className="text-[#D99739] font-bold text-2xl">{formatNumber(participants)}</p>
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen pb-24">
+    <main className="min-h-screen pb-24 max-w-[860px] mx-auto">
       {/* Lucky Prize Banner - fixed at top */}
       <LuckyPrizeBanner />
 
@@ -69,8 +69,8 @@ export default function Home() {
         <TabNavigation />
       </div>
 
-      {/* Tab Content - Secondary color background section connected to active tab */}
-      <div className="bg-[#900008] min-h-[50vh] pt-4 -mt-[1px]">
+      {/* Tab Content - Red background section connected to active tab */}
+      <div className="bg-[#91000A] min-h-[50vh] pt-4 -mt-[1px]">
         {mainTab === 'live-scores' ? <LiveScoresTab /> : <MyTicketsTab />}
       </div>
 

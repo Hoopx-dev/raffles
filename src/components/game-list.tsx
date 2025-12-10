@@ -30,7 +30,7 @@ export function GameList({ gamesByDate }: GameListProps) {
 
   if (gamesByDate.length === 0) {
     return (
-      <div className="text-center py-8 text-text-muted">
+      <div className="text-center py-8 text-white/60">
         {t.games.noGames}
       </div>
     );
@@ -46,11 +46,11 @@ export function GameList({ gamesByDate }: GameListProps) {
             className="flex items-center justify-between w-full py-2 cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <span className="text-text-dark font-medium">{date}</span>
+              <span className="text-white font-medium">{date}</span>
               <Badge variant="count">{games.length}</Badge>
             </div>
             <svg
-              className={`w-5 h-5 text-text-muted transition-transform ${
+              className={`w-5 h-5 text-white/60 transition-transform ${
                 expandedDates.has(dateKey) ? 'rotate-180' : ''
               }`}
               fill="none"

@@ -32,21 +32,21 @@ export function LuckyPrizeBanner() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#900008] to-[#600005] px-4 py-3">
+    <div className="w-full bg-gradient-to-r from-[#D99739] to-[#B8812E] px-4 py-2">
       <div className="flex items-center justify-between">
         {/* Prize Info */}
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🎉</span>
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🎉</span>
           <div>
-            <p className="text-white/80 text-xs font-medium">{t.luckyPrize.wonAmount}</p>
-            <p className="text-white text-xl font-bold">{formatNumber(displayAmount)} USDT</p>
+            <p className="text-white/80 text-[10px] font-medium">{t.luckyPrize.wonAmount}</p>
+            <p className="text-white text-sm font-bold">{formatNumber(displayAmount)} USDT</p>
           </div>
         </div>
 
         {/* Claim Button */}
         <button
           onClick={handleClaim}
-          className="px-5 py-2 bg-[#DA953F] rounded-full font-bold uppercase text-[#900008] hover:bg-[#DA953F]/90 transition-colors cursor-pointer"
+          className="px-4 py-1.5 bg-white rounded-full font-bold uppercase text-xs text-[#183824] hover:bg-white/90 transition-colors cursor-pointer"
         >
           {t.luckyPrize.claim}
         </button>

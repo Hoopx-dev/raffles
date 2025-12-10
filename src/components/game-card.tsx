@@ -14,20 +14,20 @@ export function GameCard({ game }: GameCardProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-bg-card rounded-2xl p-4 shadow-sm">
+    <div className="bg-[#FBECEC] rounded-2xl p-4 shadow-sm">
       {/* Status Badge */}
       <div className="flex flex-col items-center mb-3">
         <Badge variant={status} dot={status === 'live'}>
           {status === 'live' ? t.games.live : status === 'upcoming' ? t.games.upcoming : t.games.final}
         </Badge>
         {status === 'live' && quarter && (
-          <span className="text-text-dark text-sm mt-1">
+          <span className="text-[#183824] text-sm mt-1">
             Q{quarter}
-            {timeRemaining && <span className="text-primary ml-2">{timeRemaining}</span>}
+            {timeRemaining && <span className="text-[#91000A] ml-2">{timeRemaining}</span>}
           </span>
         )}
         {status === 'upcoming' && startTime && (
-          <span className="text-text-muted text-sm mt-1">{t.games.startsAt} {startTime}</span>
+          <span className="text-[#326046] text-sm mt-1">{t.games.startsAt} {startTime}</span>
         )}
       </div>
 
@@ -44,14 +44,14 @@ export function GameCard({ game }: GameCardProps) {
               unoptimized
             />
           </div>
-          <span className="text-text-dark text-sm font-medium text-center">{homeTeam.name}</span>
+          <span className="text-[#183824] text-sm font-medium text-center">{homeTeam.name}</span>
         </div>
 
         {/* Score */}
         <div className="flex items-center gap-3 px-4">
-          <span className="text-2xl font-bold text-text-dark">{homeTeam.score}</span>
-          <span className="text-xl text-text-muted">:</span>
-          <span className="text-2xl font-bold text-text-dark">{awayTeam.score}</span>
+          <span className="text-2xl font-bold text-[#183824]">{homeTeam.score}</span>
+          <span className="text-xl text-[#326046]">:</span>
+          <span className="text-2xl font-bold text-[#183824]">{awayTeam.score}</span>
         </div>
 
         {/* Away Team */}
@@ -65,7 +65,7 @@ export function GameCard({ game }: GameCardProps) {
               unoptimized
             />
           </div>
-          <span className="text-text-dark text-sm font-medium text-center">{awayTeam.name}</span>
+          <span className="text-[#183824] text-sm font-medium text-center">{awayTeam.name}</span>
         </div>
       </div>
     </div>

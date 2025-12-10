@@ -26,7 +26,7 @@ export function MyTicketsTab() {
   if (!connected) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
-        <p className="text-text-muted text-center mb-2">{t.tickets.pleaseConnect}</p>
+        <p className="text-white/60 text-center mb-2">{t.tickets.pleaseConnect}</p>
         <button
           className="text-primary underline font-medium cursor-pointer"
           onClick={() => {
@@ -47,12 +47,12 @@ export function MyTicketsTab() {
   if (tickets.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
-        <p className="text-text-muted text-center mb-4">{t.tickets.noTickets}</p>
+        <p className="text-white/60 text-center mb-4">{t.tickets.noTickets}</p>
         <button
           onClick={openRedeemModal}
-          className="flex items-center gap-2 text-orange font-medium cursor-pointer"
+          className="flex items-center gap-2 text-[#D99739] font-medium cursor-pointer"
         >
-          <span className="w-6 h-6 rounded-full bg-orange flex items-center justify-center text-white text-sm">+</span>
+          <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
           {t.tickets.redeemFirst}
         </button>
       </div>
@@ -93,7 +93,7 @@ export function MyTicketsTab() {
         onClick={openRedeemModal}
         className="flex items-center gap-2 mt-6 text-orange font-medium cursor-pointer"
       >
-        <span className="w-6 h-6 rounded-full bg-orange flex items-center justify-center text-white text-sm">+</span>
+        <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
         {t.tickets.redeemFirst}
       </button>
     </div>

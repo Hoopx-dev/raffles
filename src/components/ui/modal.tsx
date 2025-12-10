@@ -51,37 +51,37 @@ export function Modal({
       <div
         ref={modalRef}
         className={cn(
-          "relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl animate-slide-up sm:animate-fade-in",
+          "relative w-full max-w-lg max-h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl animate-slide-up sm:animate-fade-in flex flex-col",
           className
         )}
       >
+        {/* Fixed Close Button */}
+        {showCloseButton && (
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+
         {/* Drag Handle (mobile) */}
-        <div className="flex justify-center pt-3 sm:hidden">
+        <div className="flex justify-center pt-3 sm:hidden flex-shrink-0">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
         {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 pt-4 pb-2">
-            {title && (
-              <h2 className="text-xl font-bold text-text-dark">{title}</h2>
-            )}
-            {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer ml-auto"
-                aria-label="Close"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+        {title && (
+          <div className="px-6 pt-4 pb-2 flex-shrink-0">
+            <h2 className="text-xl font-bold text-text-dark pr-8">{title}</h2>
           </div>
         )}
 
-        {/* Content */}
-        <div className="px-6 pb-6">
+        {/* Content - Scrollable */}
+        <div className="px-6 pb-6 overflow-y-auto flex-1">
           {children}
         </div>
       </div>

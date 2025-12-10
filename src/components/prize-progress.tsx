@@ -15,7 +15,7 @@ export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize }
   const progress = Math.min((currentTickets / nextTierTickets) * 100, 100);
 
   return (
-    <div className="mx-4 p-4 rounded-2xl bg-gradient-to-r from-[rgba(255,255,255,0.2)] to-[rgba(255,255,255,0.06)]">
+    <div className="mx-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md relative z-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -30,7 +30,7 @@ export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize }
       {/* Progress bar */}
       <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-2">
         <div
-          className="h-full bg-[#DA953F] rounded-full transition-all duration-500"
+          className="h-full bg-[#D99739] rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>

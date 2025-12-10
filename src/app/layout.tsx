@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "NBA Christmas 2025 | Score Prediction Challenge",
   description: "Predict NBA Christmas Day scores and win up to 200,000 USDT! Join the HoopX Score Prediction Challenge.",
   keywords: ["NBA", "Christmas", "Basketball", "Prediction", "HoopX", "Solana", "Crypto"],
-  themeColor: "#DA953F",
+  themeColor: "#91000A",
   openGraph: {
     title: "NBA Christmas 2025 | Score Prediction Challenge",
     description: "Predict NBA Christmas Day scores and win up to 200,000 USDT!",

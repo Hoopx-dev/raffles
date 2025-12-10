@@ -47,31 +47,29 @@ export function Header() {
       <div className="relative z-10 px-4 pt-2 pb-6">
         {/* Top bar: Language toggle & Wallet */}
         <div className="flex justify-end items-center gap-2 -mb-2">
-          {/* Wallet Button */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={handleWalletClick}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                connected
-                  ? 'bg-white/20 text-white hover:bg-white/30'
-                  : 'bg-primary text-white hover:bg-primary/90'
-              }`}
-            >
-              {connected ? truncatedAddress : t.wallet.connect}
-            </button>
+          {/* Wallet Button - only show when connected */}
+          {connected && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={handleWalletClick}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-white/20 text-white hover:bg-white/30"
+              >
+                {truncatedAddress}
+              </button>
 
-            {/* Dropdown */}
-            {showDropdown && connected && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[120px] z-50">
-                <button
-                  onClick={handleDisconnect}
-                  className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer"
-                >
-                  Disconnect
-                </button>
-              </div>
-            )}
-          </div>
+              {/* Dropdown */}
+              {showDropdown && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[120px] z-50">
+                  <button
+                    onClick={handleDisconnect}
+                    className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Language toggle */}
           <button

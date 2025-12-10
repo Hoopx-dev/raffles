@@ -8,11 +8,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-secondary hover:bg-primary-dark active:scale-[0.98]",
+          "bg-primary text-[#91000A] hover:bg-primary-dark active:scale-[0.98]",
         secondary:
-          "bg-secondary text-text-dark hover:brightness-110 active:scale-[0.98]",
+          "bg-secondary text-white hover:brightness-110 active:scale-[0.98]",
         gold:
-          "bg-gold text-secondary hover:brightness-110 active:scale-[0.98]",
+          "bg-gold text-[#91000A] hover:brightness-110 active:scale-[0.98]",
         outline:
           "bg-transparent border-2 border-white/20 text-white hover:bg-white/10",
         ghost:

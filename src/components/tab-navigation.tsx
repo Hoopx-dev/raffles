@@ -12,7 +12,7 @@ export function TabNavigation() {
   const { t } = useTranslation();
 
   return (
-    <div className="px-4 pt-3">
+    <div className="px-4 pt-3 relative z-10">
       <Tabs
         tabs={[
           { id: 'live-scores', label: t.tabs.liveScores },
