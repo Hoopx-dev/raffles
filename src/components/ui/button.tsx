@@ -3,16 +3,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+  "inline-flex items-center justify-center rounded-xl font-semibold uppercase transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
   {
     variants: {
       variant: {
         primary:
-          "bg-primary text-white hover:bg-primary-dark active:scale-[0.98]",
+          "bg-primary text-secondary hover:bg-primary-dark active:scale-[0.98]",
         secondary:
           "bg-secondary text-text-dark hover:brightness-110 active:scale-[0.98]",
         gold:
-          "bg-gold text-text-dark hover:brightness-110 active:scale-[0.98]",
+          "bg-gold text-secondary hover:brightness-110 active:scale-[0.98]",
         outline:
           "bg-transparent border-2 border-white/20 text-white hover:bg-white/10",
         ghost:
@@ -23,10 +23,10 @@ const buttonVariants = cva(
           "bg-success text-white hover:brightness-110",
       },
       size: {
-        sm: "h-9 px-4 text-sm",
-        md: "h-11 px-6 text-base",
-        lg: "h-14 px-8 text-lg",
-        icon: "h-10 w-10",
+        sm: "h-8 px-3 text-xs",
+        md: "h-10 px-5 text-sm",
+        lg: "h-12 px-6 text-base",
+        icon: "h-9 w-9",
       },
       fullWidth: {
         true: "w-full",

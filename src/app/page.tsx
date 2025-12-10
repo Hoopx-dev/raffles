@@ -42,7 +42,7 @@ export default function Home() {
       {/* Lucky Prize Banner - fixed at top */}
       <LuckyPrizeBanner />
 
-      {/* Purple section with snow animation */}
+      {/* Header section with subtle gradient */}
       <div className="relative overflow-hidden bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/bg-header.png)' }}>
         {/* Snow animation covering entire purple section */}
         <SnowAnimation />
@@ -69,8 +69,8 @@ export default function Home() {
         <TabNavigation />
       </div>
 
-      {/* Tab Content - White background section connected to active tab */}
-      <div className="bg-white min-h-[50vh] pt-4 -mt-[1px]">
+      {/* Tab Content - Secondary color background section connected to active tab */}
+      <div className="bg-[#900008] min-h-[50vh] pt-4 -mt-[1px]">
         {mainTab === 'live-scores' ? <LiveScoresTab /> : <MyTicketsTab />}
       </div>
 

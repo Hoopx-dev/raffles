@@ -48,10 +48,10 @@ export function FloatingButtons() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40">
         <button
           onClick={handleButtonClick}
-          className={`w-full py-4 rounded-full font-semibold transition-all cursor-pointer ${
+          className={`w-full py-4 rounded-full font-semibold uppercase text-sm transition-all cursor-pointer ${
             connected
-              ? 'bg-gold text-text-dark hover:brightness-110'
-              : 'bg-primary text-white hover:bg-primary/90'
+              ? 'bg-gold text-secondary hover:brightness-110'
+              : 'bg-primary text-secondary hover:bg-primary-dark'
           }`}
         >
           {connected ? t.wallet.redeem : t.wallet.connectToRedeem}

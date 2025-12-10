@@ -32,7 +32,7 @@ export function LuckyPrizeBanner() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#FF9800] px-4 py-3">
+    <div className="w-full bg-gradient-to-r from-[#900008] to-[#600005] px-4 py-3">
       <div className="flex items-center justify-between">
         {/* Prize Info */}
         <div className="flex items-center gap-3">
@@ -46,7 +46,7 @@ export function LuckyPrizeBanner() {
         {/* Claim Button */}
         <button
           onClick={handleClaim}
-          className="px-5 py-2 bg-white rounded-full font-bold text-[#FF9800] hover:bg-white/90 transition-colors cursor-pointer"
+          className="px-5 py-2 bg-[#DA953F] rounded-full font-bold uppercase text-[#900008] hover:bg-[#DA953F]/90 transition-colors cursor-pointer"
         >
           {t.luckyPrize.claim}
         </button>

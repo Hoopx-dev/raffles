@@ -25,7 +25,7 @@ export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
           className={cn(
             "flex-1 py-3.5 px-4 text-sm font-semibold transition-all cursor-pointer border-none outline-none",
             activeTab === tab.id
-              ? "text-primary bg-white rounded-t-2xl"
+              ? "text-[#DA953F] bg-[#900008] rounded-t-2xl"
               : "text-white/70 bg-transparent hover:text-white"
           )}
         >
