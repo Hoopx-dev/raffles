@@ -1,26 +1,145 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1a0033;
+  --foreground: #ffffff;
 }
 
 @theme inline {
+  /* Brand Colors */
+  --color-primary: #512784;
+  --color-primary-dark: #3a1c5e;
+  --color-secondary: #FCB825;
+  --color-gold: #F5A623;
+  --color-orange: #FF6B35;
+  --color-success: #31D99C;
+  --color-danger: #FF4B4B;
+
+  /* Status Colors */
+  --color-live: #FF4444;
+  --color-upcoming: #FFB800;
+  --color-unbet: #FF6B6B;
+  --color-bet: #31D99C;
+  --color-mint: #B8F5D8;
+
+  /* Background & Foreground */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-bg-card: #FFFBEB;
+  --color-bg-card-mint: #E8FFF5;
+  --color-bg-modal: #FFFFFF;
+  --color-bg-input: #F5F5F5;
+
+  /* Text Colors */
+  --color-text-primary: #FFFFFF;
+  --color-text-dark: #1A1A2E;
+  --color-text-secondary: #B8B8B8;
+  --color-text-muted: #888888;
+
+  /* Font Families */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: linear-gradient(180deg, #512784 0%, #1a0033 100%);
+  min-height: 100vh;
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10px) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(20px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Snow Animation */
+.snowflake {
+  position: absolute;
+  color: white;
+  font-size: 1em;
+  animation: snowfall linear infinite;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Input number spinners removal */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }

@@ -1,0 +1,95 @@
+{
+  "header": {
+    "subtitle": "Score Prediction Challenge"
+  },
+  "stats": {
+    "currentPrizePool": "CURRENT PRIZE POOL",
+    "participants": "PARTICIPANTS"
+  },
+  "progress": {
+    "next": "NEXT",
+    "unlockHigherPrize": "Unlock Higher Prize Pool",
+    "tickets": "tickets"
+  },
+  "tabs": {
+    "liveScores": "LIVE SCORES",
+    "myTickets": "MY TICKETS",
+    "unbet": "UNBET",
+    "bet": "BET"
+  },
+  "cumulative": {
+    "title": "Cumulative Total Score",
+    "homeTeams": "HOME TEAMS",
+    "awayTeams": "AWAY TEAMS"
+  },
+  "games": {
+    "upcoming": "UPCOMING",
+    "live": "LIVE",
+    "final": "FINAL",
+    "startsAt": "Starts at",
+    "noGames": "No games scheduled for this date"
+  },
+  "tickets": {
+    "ticketId": "Ticket ID",
+    "homeScore": "Home Score",
+    "awayScore": "Away Score",
+    "placePrediction": "PLACE PREDICTION",
+    "pleaseConnect": "Please connect your wallet to view your tickets",
+    "connectNow": "Connect now",
+    "noTickets": "You don't have any tickets yet",
+    "redeemFirst": "Redeem tickets to start predicting!"
+  },
+  "wallet": {
+    "connect": "Connect Wallet",
+    "redeem": "Redeem Ticket"
+  },
+  "modals": {
+    "info": {
+      "title": "Information",
+      "period": "Period",
+      "periodValue": "Dec 19, 2025 10:00 PM - Dec 26, 2025 11:30 AM (HKT)",
+      "howToRedeem": "How to Redeem",
+      "step1": "Connect your Solana wallet",
+      "step2": "Ensure you have enough HoopX tokens (10,000 per ticket)",
+      "step3": "Click \"Redeem Ticket\" button",
+      "step4": "Select quantity and confirm",
+      "step5": "Tokens will be burned and tickets added to your account",
+      "step6": "Make your predictions on each ticket",
+      "prizePool": "Prize Pool",
+      "mainPrize": "Main Prize: 2,000 USDT (closest prediction wins)",
+      "luckyPrize": "Lucky Number Jackpot: 100 random winners get 10 USDT each",
+      "prizeLadder": "Prize Ladder",
+      "tier1": "100 tickets = 2,000 USDT",
+      "tier2": "1,000 tickets = 20,000 USDT",
+      "tier3": "10,000 tickets = 200,000 USDT",
+      "rules": "Rules",
+      "rule1": "Predict the cumulative HOME vs AWAY scores for all NBA games Dec 19-26",
+      "rule2": "Each prediction must be between 0-1000 for each team",
+      "rule3": "Multiple tickets allowed, each must have different predictions",
+      "rule4": "Winner is determined by closest prediction to actual scores",
+      "rule5": "In case of tie, prize is split equally"
+    },
+    "redeem": {
+      "title": "Redeem Tickets",
+      "quantity": "Quantity",
+      "availableBalance": "Available Balance",
+      "availableRedeem": "Available to Redeem",
+      "ticketPrice": "10,000 HoopX per ticket",
+      "redeem": "REDEEM"
+    },
+    "confirm": {
+      "title": "Confirm Transaction",
+      "amount": "Amount",
+      "transferTo": "Transfer to (Burn)",
+      "youllReceive": "You'll receive",
+      "networkFee": "Network fee",
+      "confirm": "CONFIRM"
+    },
+    "lucky": {
+      "congrats": "Congratulations!",
+      "luckyNumber": "Lucky Number",
+      "youWon": "You've hit a lucky number!",
+      "prize": "You won 10 USDT!"
+    }
+  }
+}
