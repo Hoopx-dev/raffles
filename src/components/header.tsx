@@ -4,12 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
 
 export function Header() {
-  const { locale, setLocale } = useUIStore();
   const { t } = useTranslation();
   const { connected, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
@@ -45,7 +43,7 @@ export function Header() {
     <header className="relative">
       {/* Content */}
       <div className="relative z-10 px-4 pt-2 pb-6">
-        {/* Top bar: Language toggle & Wallet */}
+        {/* Top bar: Wallet */}
         <div className="flex justify-end items-center gap-2 -mb-2">
           {/* Wallet Button - only show when connected */}
           {connected && (
@@ -70,14 +68,6 @@ export function Header() {
               )}
             </div>
           )}
-
-          {/* Language toggle */}
-          <button
-            onClick={() => setLocale(locale === 'en' ? 'cn' : 'en')}
-            className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors cursor-pointer"
-          >
-            {locale === 'en' ? 'EN' : '中文'}
-          </button>
         </div>
 
         {/* Logo */}

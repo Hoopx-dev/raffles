@@ -1,10 +1,6 @@
 'use client';
 
-import { useUIStore } from '@/lib/store/useUIStore';
 import en from './locales/en.json';
-import cn from './locales/cn.json';
-
-const translations = { en, cn } as const;
 
 type Translations = typeof en;
 
@@ -25,18 +21,17 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string {
 }
 
 export function useTranslation() {
-  const locale = useUIStore((state) => state.locale);
-  const t = translations[locale] as Translations;
+  const t = en as Translations;
 
   // Function to get translation by dot notation path
   const translate = (path: string): string => {
     return getNestedValue(t as unknown as Record<string, unknown>, path);
   };
 
-  return { t, locale, translate };
+  return { t, locale: 'en' as const, translate };
 }
 
 // Direct access for non-hook contexts
-export function getTranslation(locale: 'en' | 'cn') {
-  return translations[locale];
+export function getTranslation() {
+  return en;
 }
