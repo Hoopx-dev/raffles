@@ -37,9 +37,14 @@ export function GameList({ gamesByDate }: GameListProps) {
   }
 
   return (
-    <div className="px-4 space-y-4 pb-24">
-      {gamesByDate.map(({ date, dateKey, games }) => (
+    <div className="px-4 pb-24">
+      {gamesByDate.map(({ date, dateKey, games }, index) => (
         <div key={dateKey}>
+          {/* Divider line between groups */}
+          {index > 0 && (
+            <div className="border-t border-white/20 my-4" />
+          )}
+
           {/* Date Header */}
           <button
             onClick={() => toggleDate(dateKey)}

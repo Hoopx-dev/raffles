@@ -12,7 +12,7 @@ const badgeVariants = cva(
         unbet: "bg-unbet text-white",
         bet: "bg-bet text-white",
         next: "bg-[#D99739] text-[#91000A]",
-        count: "bg-primary text-white text-[10px] px-2 py-0.5 rounded-full",
+        count: "bg-[#D99739] text-[#91000A] text-[10px] px-2 py-0.5 rounded-full",
       },
     },
     defaultVariants: {

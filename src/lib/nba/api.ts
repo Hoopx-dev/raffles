@@ -186,8 +186,10 @@ export function calculateCumulativeScore(games: ProcessedGame[]): CumulativeScor
  */
 export function getRaffleDateRange(): string[] {
   const dates: string[] = [];
-  const start = new Date('2025-12-19');
-  const end = new Date('2025-12-26');
+  // Testing with Dec 2025 dates to see live/upcoming/final games
+  // TODO: Change back to Dec 19-26 for production
+  const start = new Date('2025-12-08');
+  const end = new Date('2025-12-15');
 
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     dates.push(d.toISOString().split('T')[0].replace(/-/g, '-'));

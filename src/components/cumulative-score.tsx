@@ -18,7 +18,7 @@ export function CumulativeScore({ homeTeams, awayTeams }: CumulativeScoreProps) 
         <div className="flex items-center justify-center gap-6">
           {/* Home Teams */}
           <div className="text-center flex-1">
-            <p className="text-4xl font-bold text-white">{formatNumber(homeTeams)}</p>
+            <p className="text-4xl font-bold text-[#D99739]">{formatNumber(homeTeams)}</p>
             <p className="text-white/80 text-xs uppercase tracking-wider mt-1">{t.cumulative.homeTeams}</p>
           </div>
 
@@ -27,7 +27,7 @@ export function CumulativeScore({ homeTeams, awayTeams }: CumulativeScoreProps) 
 
           {/* Away Teams */}
           <div className="text-center flex-1">
-            <p className="text-4xl font-bold text-white">{formatNumber(awayTeams)}</p>
+            <p className="text-4xl font-bold text-[#D99739]">{formatNumber(awayTeams)}</p>
             <p className="text-white/80 text-xs uppercase tracking-wider mt-1">{t.cumulative.awayTeams}</p>
           </div>
         </div>

@@ -13,13 +13,27 @@ export function GameCard({ game }: GameCardProps) {
   const { homeTeam, awayTeam, status, quarter, timeRemaining, startTime } = game;
   const { t } = useTranslation();
 
+  // Different background colors based on game status
+  const cardBgColor = status === 'live'
+    ? 'bg-[#FFF5F5] border border-[#91000A]/20' // Light red for live
+    : status === 'upcoming'
+    ? 'bg-[#F5F9F6] border border-[#326046]/20' // Light green for upcoming
+    : 'bg-[#FBECEC]'; // Light cream for final
+
   return (
-    <div className="bg-[#FBECEC] rounded-2xl p-4 shadow-sm">
+    <div className={`rounded-2xl p-4 shadow-sm ${cardBgColor}`}>
       {/* Status Badge */}
       <div className="flex flex-col items-center mb-3">
-        <Badge variant={status} dot={status === 'live'}>
-          {status === 'live' ? t.games.live : status === 'upcoming' ? t.games.upcoming : t.games.final}
-        </Badge>
+        {status === 'live' ? (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#91000A] text-white text-xs font-semibold uppercase">
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            {t.games.live}
+          </div>
+        ) : (
+          <Badge variant={status}>
+            {status === 'upcoming' ? t.games.upcoming : t.games.final}
+          </Badge>
+        )}
         {status === 'live' && quarter && (
           <span className="text-[#183824] text-sm mt-1">
             Q{quarter}
