@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NBA Christmas 2025 | Score Prediction Challenge",
+  title: "HoopXmas Raffle Ticket",
   description: "Predict NBA Christmas Day scores and win up to 200,000 USDT! Join the HoopX Score Prediction Challenge.",
   keywords: ["NBA", "Christmas", "Basketball", "Prediction", "HoopX", "Solana", "Crypto"],
   themeColor: "#91000A",
   openGraph: {
-    title: "NBA Christmas 2025 | Score Prediction Challenge",
+    title: "HoopXmas Raffle Ticket",
     description: "Predict NBA Christmas Day scores and win up to 200,000 USDT!",
     type: "website",
   },
