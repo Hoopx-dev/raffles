@@ -1,41 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { Ticket, useTicketStore } from '@/lib/store/useTicketStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { usePlaceTicket, UserTicket } from '@/lib/hooks/useTickets';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 
 interface UnbetTicketCardProps {
-  ticket: Ticket;
+  ticket: UserTicket;
+  eventId?: number;
 }
 
-// Simple lucky number check (can be customized)
-const LUCKY_NUMBERS = [777, 888, 999, 1000, 1111, 1234, 1826];
-
-function checkLuckyNumber(homeScore: number, awayScore: number): number | null {
-  const total = homeScore + awayScore;
-  if (LUCKY_NUMBERS.includes(total)) {
-    return total;
-  }
-  // Check if last digits match specific patterns
-  if (homeScore === awayScore && homeScore > 0) {
-    return homeScore; // Matching scores
-  }
-  return null;
-}
-
-export function UnbetTicketCard({ ticket }: UnbetTicketCardProps) {
+export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
   const [homeScore, setHomeScore] = useState('');
   const [awayScore, setAwayScore] = useState('');
   const [errors, setErrors] = useState<{ home?: string; away?: string }>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
 
-  const updateTicket = useTicketStore((s) => s.updateTicket);
   const openLuckyNumberModal = useUIStore((s) => s.openLuckyNumberModal);
+  const { mutate: placeTicket, isPending: isSubmitting } = usePlaceTicket();
 
   const validateScore = (value: string): boolean => {
     const num = parseInt(value, 10);
@@ -57,41 +42,39 @@ export function UnbetTicketCard({ ticket }: UnbetTicketCardProps) {
       return;
     }
 
-    setIsSubmitting(true);
     setErrors({});
 
     const home = parseInt(homeScore, 10);
     const away = parseInt(awayScore, 10);
 
-    // Check for lucky number
-    const luckyNumber = checkLuckyNumber(home, away);
-    const isLucky = luckyNumber !== null;
-
-    // Update ticket with lucky winner status
-    updateTicket(ticket.id, {
-      status: 'bet',
-      homeScore: home,
-      awayScore: away,
-      timestamp: Date.now(),
-      isLuckyWinner: isLucky,
-      luckyNumber: luckyNumber ?? undefined,
-    });
-
-    // Show lucky number modal if won
-    if (isLucky) {
-      setTimeout(() => {
-        openLuckyNumberModal(luckyNumber);
-      }, 300);
-    }
-
-    setIsSubmitting(false);
+    placeTicket(
+      {
+        eventId,
+        ticketId: ticket.id,
+        predictHomeScore: home,
+        predictAwayScore: away,
+      },
+      {
+        onSuccess: (result) => {
+          console.log('Place ticket result:', result);
+          // Show lucky number modal if hit lucky egg
+          if (result.eggReward?.success && result.eggReward.luckyNumbers.length > 0) {
+            openLuckyNumberModal(result.eggReward.luckyNumbers[0]);
+          }
+        },
+        onError: (error) => {
+          console.error('Failed to place ticket:', error);
+          setErrors({ home: 'Failed to submit prediction' });
+        },
+      }
+    );
   };
 
   return (
     <div className="bg-bg-card rounded-2xl p-4 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <span className="text-text-dark font-bold">{t.tickets.ticketId} #{ticket.id}</span>
+        <span className="text-text-dark font-bold">{ticket.ticketCode}</span>
         <Badge variant="unbet">{t.tabs.unbet}</Badge>
       </div>
 

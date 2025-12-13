@@ -8,11 +8,22 @@ interface PrizeProgressProps {
   currentTickets: number;
   nextTierTickets: number;
   nextTierPrize: number;
+  isLoading?: boolean;
 }
 
-export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize }: PrizeProgressProps) {
+export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize, isLoading }: PrizeProgressProps) {
   const { t } = useTranslation();
   const progress = Math.min((currentTickets / nextTierTickets) * 100, 100);
+
+  if (isLoading) {
+    return (
+      <div className="mx-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md relative z-10">
+        <div className="h-6 w-48 bg-white/20 animate-pulse rounded mb-3" />
+        <div className="h-2 bg-white/20 animate-pulse rounded-full mb-2" />
+        <div className="h-4 w-32 bg-white/20 animate-pulse rounded" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md relative z-10">

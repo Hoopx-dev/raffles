@@ -3,27 +3,26 @@
 import { useState } from 'react';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useUIStore } from '@/lib/store/useUIStore';
-import { useTicketStore } from '@/lib/store/useTicketStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
 import { QuantitySelector } from './ui/quantity-selector';
 import { formatNumber } from '@/lib/utils';
 
-const TICKET_PRICE = 10000; // HoopX per ticket
+const DEFAULT_TICKET_PRICE = 10000; // HoopX per ticket
 
-export function RedeemModal() {
+interface RedeemModalProps {
+  ticketPrice?: number;
+}
+
+export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalProps) {
   const { isRedeemModalOpen, closeRedeemModal, openConfirmModal } = useUIStore();
   const hoopxBalance = useWalletStore((s) => s.hoopxBalance);
-  const availableRedeem = useTicketStore((s) => s.availableRedeem);
   const [quantity, setQuantity] = useState(1);
   const { t } = useTranslation();
 
-  const maxTickets = Math.min(
-    availableRedeem > 0 ? availableRedeem : 10, // Default to 10 if no backend data
-    Math.floor(hoopxBalance / TICKET_PRICE)
-  );
-  const totalCost = quantity * TICKET_PRICE;
+  const maxTickets = Math.max(1, Math.floor(hoopxBalance / ticketPrice));
+  const totalCost = quantity * ticketPrice;
   const hasEnoughBalance = hoopxBalance >= totalCost;
 
   const handleRedeem = () => {
@@ -53,8 +52,8 @@ export function RedeemModal() {
             <span className="text-text-dark font-medium">{formatNumber(hoopxBalance)} HOOPX</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-muted">{t.modals.redeem.availableRedeem}</span>
-            <span className="text-text-dark font-medium">{availableRedeem > 0 ? availableRedeem : '∞'} Tickets</span>
+            <span className="text-text-muted">Price per ticket</span>
+            <span className="text-text-dark font-medium">{formatNumber(ticketPrice)} HOOPX</span>
           </div>
         </div>
 

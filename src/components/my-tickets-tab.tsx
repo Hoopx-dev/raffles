@@ -1,26 +1,44 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useTicketStore } from '@/lib/store/useTicketStore';
 import { useTabStore } from '@/lib/store/useTabStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useTicketList, useTicketCounts } from '@/lib/hooks/useTickets';
 import { SubTabs } from './ui/tabs';
 import { UnbetTicketCard } from './unbet-ticket-card';
 import { BetTicketCard } from './bet-ticket-card';
 
 export function MyTicketsTab() {
   const { connected } = useWallet();
-  const tickets = useTicketStore((s) => s.tickets);
   const { ticketSubTab, setTicketSubTab } = useTabStore();
   const openRedeemModal = useUIStore((s) => s.openRedeemModal);
   const { t } = useTranslation();
 
-  const unbetTickets = tickets.filter((t) => t.status === 'unbet');
-  const betTickets = tickets.filter((t) => t.status === 'bet');
-  const hasUnbet = unbetTickets.length > 0;
-  const hasBet = betTickets.length > 0;
+  // Fetch counts first to determine which tabs to show
+  const { data: counts, isLoading: countsLoading } = useTicketCounts();
+
+  const hasUnbet = (counts?.unusedCount || 0) > 0;
+  const hasBet = (counts?.placedCount || 0) > 0;
   const showSubTabs = hasUnbet && hasBet;
+
+  // Determine which status to fetch based on available tickets
+  const effectiveStatus = showSubTabs
+    ? (ticketSubTab === 'unbet' ? 'UNUSED' : 'PLACED')
+    : hasUnbet
+    ? 'UNUSED'
+    : hasBet
+    ? 'PLACED'
+    : 'ALL';
+
+  // Fetch tickets based on effective status
+  const { data: ticketData, isLoading: ticketsLoading, error } = useTicketList(effectiveStatus);
+
+  const isLoading = countsLoading || ticketsLoading;
+  // Filter out invalid tickets
+  const tickets = (ticketData?.records || []).filter(
+    (t) => t.status === 'UNUSED' || t.status === 'PLACED' || t.status === 'EXPIRED'
+  );
 
   // Not connected state
   if (!connected) {
@@ -38,6 +56,32 @@ export function MyTicketsTab() {
           }}
         >
           {t.tickets.connectNow}
+        </button>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mb-4" />
+        <p className="text-white/60 text-center">Loading tickets...</p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <p className="text-red-400 text-center mb-4">Failed to load tickets</p>
+        <button
+          onClick={openRedeemModal}
+          className="flex items-center gap-2 text-[#D99739] font-medium cursor-pointer"
+        >
+          <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
+          {t.tickets.redeemFirst}
         </button>
       </div>
     );
@@ -66,8 +110,8 @@ export function MyTicketsTab() {
         <div className="mb-4">
           <SubTabs
             tabs={[
-              { id: 'unbet', label: t.tabs.unbet },
-              { id: 'bet', label: t.tabs.bet },
+              { id: 'unbet', label: `${t.tabs.unbet} (${counts?.unusedCount || 0})` },
+              { id: 'bet', label: `${t.tabs.bet} (${counts?.placedCount || 0})` },
             ]}
             activeTab={ticketSubTab}
             onTabChange={(tab) => setTicketSubTab(tab as 'unbet' | 'bet')}
@@ -77,15 +121,13 @@ export function MyTicketsTab() {
 
       {/* Ticket List */}
       <div className="space-y-4">
-        {(!showSubTabs || ticketSubTab === 'unbet') &&
-          unbetTickets.map((ticket) => (
+        {tickets.map((ticket) =>
+          ticket.status === 'UNUSED' ? (
             <UnbetTicketCard key={ticket.id} ticket={ticket} />
-          ))}
-
-        {(!showSubTabs || ticketSubTab === 'bet') &&
-          betTickets.map((ticket) => (
+          ) : (
             <BetTicketCard key={ticket.id} ticket={ticket} />
-          ))}
+          )
+        )}
       </div>
 
       {/* Redeem More Button */}

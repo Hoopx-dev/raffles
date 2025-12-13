@@ -1,54 +1,127 @@
 'use client';
 
 import { useState } from 'react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
 import { useUIStore } from '@/lib/store/useUIStore';
-import { useTicketStore } from '@/lib/store/useTicketStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useRedeemTickets } from '@/lib/hooks/useTickets';
+import { burnHoopxTokens } from '@/lib/solana/burnTokens';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
-import { formatNumber, generateTicketId, truncateAddress } from '@/lib/utils';
+import { formatNumber, truncateAddress } from '@/lib/utils';
 
-const TICKET_PRICE = 10000;
-const BURN_ADDRESS = '1nc1nerator11111111111111111111111111111111';
+const DEFAULT_TICKET_PRICE = 10000;
+const DEFAULT_BURN_ADDRESS = '1nc1nerator11111111111111111111111111111111';
 
 interface ConfirmModalProps {
   onSuccess?: () => void;
+  eventId?: number;
+  burnAddress?: string;
+  ticketPrice?: number;
 }
 
-export function ConfirmModal({ onSuccess }: ConfirmModalProps) {
+export function ConfirmModal({
+  onSuccess,
+  eventId = 1,
+  burnAddress = DEFAULT_BURN_ADDRESS,
+  ticketPrice = DEFAULT_TICKET_PRICE,
+}: ConfirmModalProps) {
   const { isConfirmModalOpen, closeConfirmModal, pendingRedeemAmount } = useUIStore();
-  const addTickets = useTicketStore((s) => s.addTickets);
-  const setHoopxBalance = useWalletStore((s) => s.setHoopxBalance);
+  const { address } = useWalletStore();
   const hoopxBalance = useWalletStore((s) => s.hoopxBalance);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const setHoopxBalance = useWalletStore((s) => s.setHoopxBalance);
+  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState<'confirm' | 'burning' | 'redeeming'>('confirm');
   const { t } = useTranslation();
 
-  const totalCost = pendingRedeemAmount * TICKET_PRICE;
+  const { connection } = useConnection();
+  const { publicKey, signTransaction } = useWallet();
+  const { mutate: redeemTickets, isPending: isRedeeming } = useRedeemTickets();
+
+  const totalCost = pendingRedeemAmount * ticketPrice;
+  const isProcessing = step === 'burning' || step === 'redeeming';
 
   const handleConfirm = async () => {
-    setIsProcessing(true);
-
-    // Simulate transaction processing
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Create new tickets
-    const newTickets = Array.from({ length: pendingRedeemAmount }, () => ({
-      id: generateTicketId(),
-      status: 'unbet' as const,
-    }));
-
-    addTickets(newTickets);
-
-    // Update balance (simulate burn)
-    setHoopxBalance(hoopxBalance - totalCost);
-
-    setIsProcessing(false);
-    closeConfirmModal();
-
-    if (onSuccess) {
-      onSuccess();
+    if (!address || !publicKey || !signTransaction) {
+      setError('Wallet not connected');
+      return;
     }
+
+    setError(null);
+    setStep('burning');
+
+    try {
+      // Step 1: Burn HOOPX tokens on-chain
+      const burnResult = await burnHoopxTokens({
+        connection,
+        walletPublicKey: publicKey,
+        amount: totalCost,
+        signTransaction,
+        burnAddress,
+      });
+
+      if (!burnResult.success) {
+        // Handle user cancellation silently
+        if (burnResult.error === 'Transaction cancelled') {
+          setStep('confirm');
+          return;
+        }
+        // Show error for other failures
+        setError(burnResult.error || 'Failed to burn tokens');
+        setStep('confirm');
+        return;
+      }
+
+      console.log('Burn transaction:', burnResult.txHash);
+      setStep('redeeming');
+
+      // Step 2: Call API to redeem tickets with the real txHash
+      redeemTickets(
+        {
+          eventId,
+          txHash: burnResult.txHash,
+          userWallet: address,
+          amountToken: totalCost,
+          ticketQuantity: pendingRedeemAmount,
+        },
+        {
+          onSuccess: (ticketsCreated) => {
+            console.log('Redeemed tickets:', ticketsCreated);
+            // Update local balance
+            setHoopxBalance(hoopxBalance - totalCost);
+            setStep('confirm');
+            closeConfirmModal();
+            if (onSuccess) {
+              onSuccess();
+            }
+          },
+          onError: (err) => {
+            console.error('Failed to redeem tickets:', err);
+            setError('Token burn succeeded but ticket creation failed. Contact support.');
+            setStep('confirm');
+          },
+        }
+      );
+    } catch (err) {
+      console.error('Transaction failed:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Transaction failed';
+
+      // Don't show error for user cancellation - just reset state
+      if (errorMessage === 'Transaction cancelled') {
+        setError(null);
+      } else {
+        setError(errorMessage);
+      }
+      setStep('confirm');
+    }
+  };
+
+  const getButtonText = () => {
+    if (step === 'burning') return 'Burning tokens...';
+    if (step === 'redeeming') return 'Creating tickets...';
+    return t.modals.confirm.confirm;
   };
 
   return (
@@ -75,7 +148,7 @@ export function ConfirmModal({ onSuccess }: ConfirmModalProps) {
         <div className="space-y-3 bg-bg-input rounded-xl p-4">
           <div className="flex justify-between text-sm">
             <span className="text-text-muted">{t.modals.confirm.transferTo}</span>
-            <span className="text-text-dark font-mono text-xs">{truncateAddress(BURN_ADDRESS, 6)}</span>
+            <span className="text-text-dark font-mono text-xs">{truncateAddress(burnAddress, 6)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-muted">{t.modals.confirm.youllReceive}</span>
@@ -87,6 +160,13 @@ export function ConfirmModal({ onSuccess }: ConfirmModalProps) {
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
         {/* Confirm Button */}
         <Button
           variant="gold"
@@ -94,8 +174,9 @@ export function ConfirmModal({ onSuccess }: ConfirmModalProps) {
           size="lg"
           onClick={handleConfirm}
           isLoading={isProcessing}
+          disabled={isProcessing}
         >
-          {t.modals.confirm.confirm}
+          {getButtonText()}
         </Button>
       </div>
     </Modal>

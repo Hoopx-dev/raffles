@@ -14,23 +14,25 @@ import { StatsBar } from "@/components/stats-bar";
 import { TabNavigation } from "@/components/tab-navigation";
 import { Toast } from "@/components/ui/toast";
 import { useTabStore } from "@/lib/store/useTabStore";
+import { useHomeData, getNextTier } from "@/lib/hooks/useHomeData";
 import { useState } from "react";
-
-// Dummy stats (will be replaced with real data from backend)
-const DUMMY_STATS = {
-  prizePool: 2000,
-  participants: 127,
-  currentTickets: 127,
-  nextTierTickets: 1000,
-  nextTierPrize: 20000,
-};
 
 export default function Home() {
   const { mainTab } = useTabStore();
+  const { data: homeData, isLoading: isHomeLoading } = useHomeData();
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error" | "info";
   } | null>(null);
+
+  // Get event info from API
+  const eventInfo = homeData?.eventInfo;
+  const poolTiers = homeData?.poolTierVOList || [];
+
+  // Calculate next tier
+  const nextTier = eventInfo
+    ? getNextTier(eventInfo.totalTicketsPlaced, poolTiers)
+    : null;
 
   const handleRedeemSuccess = () => {
     setToast({
@@ -54,19 +56,18 @@ export default function Home() {
 
         {/* Stats Bar */}
         <StatsBar
-          prizePool={DUMMY_STATS.prizePool}
-          participants={DUMMY_STATS.participants}
+          prizePool={eventInfo?.currentPrizePool || 0}
+          participants={eventInfo?.totalTicketsPlaced || 0}
+          isLoading={isHomeLoading}
         />
 
         {/* Prize Progress */}
         <PrizeProgress
-          currentTickets={DUMMY_STATS.currentTickets}
-          nextTierTickets={DUMMY_STATS.nextTierTickets}
-          nextTierPrize={DUMMY_STATS.nextTierPrize}
+          currentTickets={eventInfo?.totalTicketsPlaced || 0}
+          nextTierTickets={nextTier?.nextTierTickets || 1000}
+          nextTierPrize={nextTier?.nextTierPrize || 20000}
+          isLoading={isHomeLoading}
         />
-
-        {/* Lucky Prize Banner - under unlock card */}
-        {/* <LuckyPrizeBanner /> */}
 
         {/* Tab Navigation */}
         <TabNavigation />
@@ -81,8 +82,13 @@ export default function Home() {
       <FloatingButtons />
 
       {/* Modals */}
-      <RedeemModal />
-      <ConfirmModal onSuccess={handleRedeemSuccess} />
+      <RedeemModal ticketPrice={eventInfo?.ticketPriceHoopx} />
+      <ConfirmModal
+        onSuccess={handleRedeemSuccess}
+        eventId={eventInfo?.id}
+        burnAddress={eventInfo?.destroyWalletAddress}
+        ticketPrice={eventInfo?.ticketPriceHoopx}
+      />
       <InfoModal />
       <LuckyNumberModal />
 
