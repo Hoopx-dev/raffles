@@ -2,7 +2,7 @@
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useTranslation } from '@/i18n/useTranslation';
-import { useTicketStore } from '@/lib/store/useTicketStore';
+import { useLuckyStats } from '@/lib/hooks/useLucky';
 import { formatNumber } from '@/lib/utils';
 
 // Telegram customer service link - update this with actual link
@@ -11,23 +11,19 @@ const TELEGRAM_SUPPORT_URL = 'https://t.me/hoopx_support';
 export function LuckyPrizeBanner() {
   const { t } = useTranslation();
   const { connected } = useWallet();
-  const tickets = useTicketStore((s) => s.tickets);
+  const { data: luckyStats, isLoading } = useLuckyStats();
 
-  // Calculate total won amount from lucky tickets
-  // Each lucky number hit = 10 USDT
-  const luckyTickets = tickets.filter((ticket) => ticket.isLuckyWinner);
-  const totalWonAmount = luckyTickets.length * 10;
+  const totalWonAmount = luckyStats?.totalRewardAmount || 0;
+  const totalCount = luckyStats?.totalCount || 0;
 
-  // TODO: Remove this demo amount in production
-  // For demo purposes, show a sample amount if no real wins yet
-  const displayAmount = totalWonAmount > 0 ? totalWonAmount : 10;
-  const showBanner = connected; // Only show when wallet is connected
+  // Only show banner when connected and has wins
+  const showBanner = connected && totalWonAmount > 0;
 
   const handleClaim = () => {
     window.open(TELEGRAM_SUPPORT_URL, '_blank');
   };
 
-  if (!showBanner) {
+  if (!showBanner || isLoading) {
     return null;
   }
 
@@ -40,8 +36,10 @@ export function LuckyPrizeBanner() {
             <span className="text-xl">🎉</span>
           </div>
           <div>
-            <p className="text-white/80 text-xs font-medium">{t.luckyPrize.wonAmount}</p>
-            <p className="text-white text-lg font-bold">{formatNumber(displayAmount)} USDT</p>
+            <p className="text-white/80 text-xs font-medium">
+              {t.luckyPrize.wonAmount} ({totalCount}x)
+            </p>
+            <p className="text-white text-lg font-bold">{formatNumber(totalWonAmount)} USDT</p>
           </div>
         </div>
 

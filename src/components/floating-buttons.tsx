@@ -5,6 +5,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useEventStatus } from '@/lib/hooks/useHomeData';
 import { useEffect } from 'react';
 
 export function FloatingButtons() {
@@ -13,6 +14,7 @@ export function FloatingButtons() {
   const { openInfoModal, openRedeemModal } = useUIStore();
   const { setAddress, clearAddress, setHoopxBalance } = useWalletStore();
   const { t } = useTranslation();
+  const { isEventEnded } = useEventStatus();
 
   // Sync wallet connection state
   useEffect(() => {
@@ -47,19 +49,21 @@ export function FloatingButtons() {
         </svg>
       </button>
 
-      {/* Connect/Redeem Button - always show */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40 max-w-[860px] mx-auto">
-        <button
-          onClick={handleButtonClick}
-          className={`w-full py-4 rounded-full font-semibold uppercase text-sm transition-all cursor-pointer ${
-            connected
-              ? 'bg-gold text-[#91000A] hover:brightness-110'
-              : 'bg-primary text-[#91000A] hover:bg-primary-dark'
-          }`}
-        >
-          {connected ? t.wallet.redeem : t.wallet.connectToRedeem}
-        </button>
-      </div>
+      {/* Connect/Redeem Button - hide when event ended */}
+      {!isEventEnded && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40 max-w-[860px] mx-auto">
+          <button
+            onClick={handleButtonClick}
+            className={`w-full py-4 rounded-full font-semibold uppercase text-sm transition-all cursor-pointer ${
+              connected
+                ? 'bg-gold text-[#91000A] hover:brightness-110'
+                : 'bg-primary text-[#91000A] hover:bg-primary-dark'
+            }`}
+          >
+            {connected ? t.wallet.redeem : t.wallet.connectToRedeem}
+          </button>
+        </div>
+      )}
     </>
   );
 }

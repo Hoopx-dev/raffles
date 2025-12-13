@@ -56,5 +56,15 @@ export function getNextTier(
   return null;
 }
 
+/**
+ * Check if event is active (status 1)
+ */
+export function useEventStatus() {
+  const { data } = useHomeData();
+  const isEventActive = data?.eventInfo?.status === 1;
+  const isEventEnded = data?.eventInfo?.status === 2;
+  return { isEventActive, isEventEnded };
+}
+
 // Re-export types
 export type { HomeIndexData, RaffleEventInfo, GameInfo, PrizePoolTier };

@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { InfoModal } from "@/components/info-modal";
 import { LiveScoresTab } from "@/components/live-scores-tab";
 import { LuckyNumberModal } from "@/components/lucky-number-modal";
+import { LuckyPrizeBanner } from "@/components/lucky-prize-banner";
 import { MyTicketsTab } from "@/components/my-tickets-tab";
 import { PrizeProgress } from "@/components/prize-progress";
 import { RedeemModal } from "@/components/redeem-modal";
@@ -69,6 +70,9 @@ export default function Home() {
           isLoading={isHomeLoading}
           isMaxTier={nextTier?.isMaxTier}
         />
+
+        {/* Lucky Prize Banner */}
+        <LuckyPrizeBanner />
 
         {/* Tab Navigation */}
         <TabNavigation />

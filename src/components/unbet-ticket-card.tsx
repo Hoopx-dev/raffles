@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useEventStatus } from '@/lib/hooks/useHomeData';
 import { usePlaceTicket, UserTicket } from '@/lib/hooks/useTickets';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
@@ -18,6 +19,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
   const [awayScore, setAwayScore] = useState('');
   const [errors, setErrors] = useState<{ home?: string; away?: string }>({});
   const { t } = useTranslation();
+  const { isEventEnded } = useEventStatus();
 
   const openLuckyNumberModal = useUIStore((s) => s.openLuckyNumberModal);
   const { mutate: placeTicket, isPending: isSubmitting } = usePlaceTicket();
@@ -78,44 +80,52 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
         <Badge variant="unbet">{t.tabs.unbet}</Badge>
       </div>
 
-      {/* Score Inputs */}
-      <div className="flex items-start gap-3 mb-4">
-        <div className="flex-1">
-          <Input
-            type="number"
-            label={t.tickets.homeScore}
-            placeholder="0-1000"
-            value={homeScore}
-            onChange={(e) => setHomeScore(e.target.value)}
-            error={errors.home}
-            min={0}
-            max={1000}
-          />
+      {/* Score Inputs - hide when event ended */}
+      {isEventEnded ? (
+        <div className="text-center py-4 text-text-muted text-sm">
+          Event has ended. Betting is closed.
         </div>
-        <div className="flex items-center justify-center pt-8 text-text-muted text-xl">:</div>
-        <div className="flex-1">
-          <Input
-            type="number"
-            label={t.tickets.awayScore}
-            placeholder="0-1000"
-            value={awayScore}
-            onChange={(e) => setAwayScore(e.target.value)}
-            error={errors.away}
-            min={0}
-            max={1000}
-          />
-        </div>
-      </div>
+      ) : (
+        <>
+          <div className="flex items-start gap-3 mb-4">
+            <div className="flex-1">
+              <Input
+                type="number"
+                label={t.tickets.homeScore}
+                placeholder="0-1000"
+                value={homeScore}
+                onChange={(e) => setHomeScore(e.target.value)}
+                error={errors.home}
+                min={0}
+                max={1000}
+              />
+            </div>
+            <div className="flex items-center justify-center pt-8 text-text-muted text-xl">:</div>
+            <div className="flex-1">
+              <Input
+                type="number"
+                label={t.tickets.awayScore}
+                placeholder="0-1000"
+                value={awayScore}
+                onChange={(e) => setAwayScore(e.target.value)}
+                error={errors.away}
+                min={0}
+                max={1000}
+              />
+            </div>
+          </div>
 
-      {/* Submit Button */}
-      <Button
-        variant="primary"
-        fullWidth
-        onClick={handleSubmit}
-        isLoading={isSubmitting}
-      >
-        {t.tickets.placePrediction}
-      </Button>
+          {/* Submit Button */}
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={handleSubmit}
+            isLoading={isSubmitting}
+          >
+            {t.tickets.placePrediction}
+          </Button>
+        </>
+      )}
     </div>
   );
 }
