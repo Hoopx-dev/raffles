@@ -10,7 +10,7 @@ interface BetTicketCardProps {
 
 function getWinStatusLabel(winStatus: number): string {
   switch (winStatus) {
-    case 0: return 'Pending';
+    case 0: return 'Ongoing';
     case 1: return 'Won';
     case 2: return 'Lost';
     default: return 'Unknown';
