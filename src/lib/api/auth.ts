@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_HOOPX_API_URL || 'http://54.46.105.230:9093';
+const API_BASE_URL = process.env.NEXT_PUBLIC_HOOPX_API_URL || 'https://a03low.hoopx.gg';
 
 interface ApiResponse<T> {
   code: number;
@@ -26,8 +26,9 @@ export async function getNonce(address: string): Promise<string> {
   }
 
   const result: ApiResponse<string> = await response.json();
+  console.log('getNonce result:', result);
 
-  if (result.code !== 0) {
+  if (result.code !== 200) {
     throw new Error(result.msg || 'Failed to get nonce');
   }
 
@@ -57,8 +58,9 @@ export async function siwsLogin(params: SiwsLoginParams): Promise<string> {
   }
 
   const result: ApiResponse<string> = await response.json();
+  console.log('siwsLogin result:', result);
 
-  if (result.code !== 0) {
+  if (result.code !== 200) {
     throw new Error(result.msg || 'Login failed');
   }
 
@@ -67,20 +69,35 @@ export async function siwsLogin(params: SiwsLoginParams): Promise<string> {
 
 /**
  * Create SIWS message for signing
+ * Format: siws:{domain}:{nonce};action=login;address={walletAddress}
  */
 export function createSiwsMessage(address: string, nonce: string): string {
   const domain = typeof window !== 'undefined' ? window.location.host : 'hoopx.gg';
-  const uri = typeof window !== 'undefined' ? window.location.origin : 'https://hoopx.gg';
-  const issuedAt = new Date().toISOString();
+  return `siws:${domain}:${nonce};action=login;address=${address}`;
+}
 
-  return `${domain} wants you to sign in with your Solana account:
-${address}
+/**
+ * Logout from SIWS session
+ * Note: This is best-effort - local logout will proceed even if backend fails
+ */
+export async function siwsLogout(token: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-Sign in to HOOPX
+    const result: ApiResponse<string> = await response.json();
+    console.log('siwsLogout result:', result);
 
-URI: ${uri}
-Version: 1
-Chain ID: mainnet
-Nonce: ${nonce}
-Issued At: ${issuedAt}`;
+    if (result.code !== 200) {
+      console.warn('Backend logout returned non-200:', result.msg);
+    }
+  } catch (error) {
+    // Backend logout failed, but we'll still proceed with local logout
+    console.warn('Backend logout request failed:', error);
+  }
 }

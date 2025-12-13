@@ -1,11 +1,16 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface WalletState {
   address: string | null;
   truncatedAddress: string | null;
   hoopxBalance: number;
+  sessionToken: string | null;
+  isAuthenticated: boolean;
   setAddress: (address: string | null) => void;
   setHoopxBalance: (balance: number) => void;
+  setSession: (token: string) => void;
+  clearSession: () => void;
   clearAddress: () => void;
 }
 
@@ -17,23 +22,48 @@ const formatAddress = (address: string): string => {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 };
 
-export const useWalletStore = create<WalletState>((set) => ({
-  address: null,
-  truncatedAddress: null,
-  hoopxBalance: 0,
+export const useWalletStore = create<WalletState>()(
+  persist(
+    (set) => ({
+      address: null,
+      truncatedAddress: null,
+      hoopxBalance: 0,
+      sessionToken: null,
+      isAuthenticated: false,
 
-  setAddress: (address) => set({
-    address,
-    truncatedAddress: address ? formatAddress(address) : null,
-  }),
+      setAddress: (address) => set({
+        address,
+        truncatedAddress: address ? formatAddress(address) : null,
+      }),
 
-  setHoopxBalance: (balance) => set({
-    hoopxBalance: balance,
-  }),
+      setHoopxBalance: (balance) => set({
+        hoopxBalance: balance,
+      }),
 
-  clearAddress: () => set({
-    address: null,
-    truncatedAddress: null,
-    hoopxBalance: 0,
-  }),
-}));
+      setSession: (token) => set({
+        sessionToken: token,
+        isAuthenticated: true,
+      }),
+
+      clearSession: () => set({
+        sessionToken: null,
+        isAuthenticated: false,
+      }),
+
+      clearAddress: () => set({
+        address: null,
+        truncatedAddress: null,
+        hoopxBalance: 0,
+        sessionToken: null,
+        isAuthenticated: false,
+      }),
+    }),
+    {
+      name: 'hoopx-wallet-storage',
+      partialize: (state) => ({
+        sessionToken: state.sessionToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
+  )
+);

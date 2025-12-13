@@ -2,16 +2,19 @@
 
 import { useTranslation } from "@/i18n/useTranslation";
 import { useWalletStore } from "@/lib/store/useWalletStore";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useRef, useState } from "react";
 
 export function Header() {
   const { t } = useTranslation();
-  const { connected, disconnect } = useWallet();
+  const { connected } = useWallet();
   const { setVisible } = useWalletModal();
   const { truncatedAddress } = useWalletStore();
+  const { logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -36,9 +39,14 @@ export function Header() {
     }
   };
 
-  const handleDisconnect = () => {
-    disconnect();
-    setShowDropdown(false);
+  const handleDisconnect = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      setIsLoggingOut(false);
+      setShowDropdown(false);
+    }
   };
 
   return (
@@ -62,9 +70,10 @@ export function Header() {
                 <div className='absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[120px] z-50'>
                   <button
                     onClick={handleDisconnect}
-                    className='w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer'
+                    disabled={isLoggingOut}
+                    className='w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
                   >
-                    Disconnect
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
                   </button>
                 </div>
               )}
