@@ -2,10 +2,37 @@
 
 import { useTranslation } from "@/i18n/useTranslation";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useHomeData } from "@/lib/hooks/useHomeData";
 import { useWalletStore } from "@/lib/store/useWalletStore";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useRef, useState } from "react";
+
+interface TimeRemaining {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  isExpired: boolean;
+}
+
+function calculateTimeRemaining(endTime: string): TimeRemaining {
+  const end = new Date(endTime).getTime();
+  const now = Date.now();
+  const diff = end - now;
+
+  if (diff <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
+  }
+
+  return {
+    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+    minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+    seconds: Math.floor((diff % (1000 * 60)) / 1000),
+    isExpired: false,
+  };
+}
 
 export function Header() {
   const { t } = useTranslation();
@@ -13,8 +40,12 @@ export function Header() {
   const { setVisible } = useWalletModal();
   const { truncatedAddress } = useWalletStore();
   const { logout } = useAuth();
+  const { data: homeData } = useHomeData();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(
+    null
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -30,6 +61,22 @@ export function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    const endTime = homeData?.eventInfo?.endTime;
+    if (!endTime) return;
+
+    // Initial calculation
+    setTimeRemaining(calculateTimeRemaining(endTime));
+
+    // Update every second
+    const interval = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining(endTime));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [homeData?.eventInfo?.endTime]);
 
   const handleWalletClick = () => {
     if (connected) {
@@ -93,6 +140,46 @@ export function Header() {
           <p className='text-white/90 text-lg font-medium mt-1'>
             {t.header.subtitle}
           </p>
+
+          {/* Countdown Timer */}
+          {timeRemaining && !timeRemaining.isExpired && (
+            <div className='mt-2 flex items-center gap-2'>
+              <div className='flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2'>
+                <div className='text-center'>
+                  <span className='text-white font-bold'>
+                    {String(timeRemaining.days).padStart(2, "0")}
+                  </span>
+                  <p className='text-white/60 text-[10px] uppercase'>Days</p>
+                </div>
+                <span className='text-white/60 mx-1'>:</span>
+                <div className='text-center'>
+                  <span className='text-white font-bold'>
+                    {String(timeRemaining.hours).padStart(2, "0")}
+                  </span>
+                  <p className='text-white/60 text-[10px] uppercase'>Hrs</p>
+                </div>
+                <span className='text-white/60 mx-1'>:</span>
+                <div className='text-center'>
+                  <span className='text-white font-bold'>
+                    {String(timeRemaining.minutes).padStart(2, "0")}
+                  </span>
+                  <p className='text-white/60 text-[10px] uppercase'>Min</p>
+                </div>
+                <span className='text-white/60 mx-1'>:</span>
+                <div className='text-center'>
+                  <span className='text-white font-bold'>
+                    {String(timeRemaining.seconds).padStart(2, "0")}
+                  </span>
+                  <p className='text-white/60 text-[10px] uppercase'>Sec</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {timeRemaining?.isExpired && (
+            <div className='mt-4 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2'>
+              <span className='text-gold font-bold'>Event Ended</span>
+            </div>
+          )}
         </div>
       </div>
     </header>

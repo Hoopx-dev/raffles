@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { formatNumber } from '@/lib/utils';
-import { useTranslation } from '@/i18n/useTranslation';
+import { useTranslation } from "@/i18n/useTranslation";
+import { formatNumber } from "@/lib/utils";
 
 interface StatsBarProps {
   prizePool: number;
@@ -9,30 +9,41 @@ interface StatsBarProps {
   isLoading?: boolean;
 }
 
-export function StatsBar({ prizePool, participants, isLoading }: StatsBarProps) {
+export function StatsBar({
+  prizePool,
+  participants,
+  isLoading,
+}: StatsBarProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex justify-between items-end px-4 py-3">
+    <div className='flex justify-between items-end px-4 py-2'>
       {/* Prize Pool */}
       <div>
-        <p className="text-white/60 text-xs uppercase tracking-wide">{t.stats.currentPrizePool}</p>
+        <p className='text-white/60 text-xs uppercase tracking-wide'>
+          {t.stats.currentPrizePool}
+        </p>
         {isLoading ? (
-          <div className="h-8 w-24 bg-white/20 animate-pulse rounded" />
+          <div className='h-8 w-24 bg-white/20 animate-pulse rounded' />
         ) : (
-          <p className="text-white text-2xl font-bold">
-            {formatNumber(prizePool)} <span className="text-base font-normal">USDT</span>
+          <p className='text-white text-2xl font-bold'>
+            {formatNumber(prizePool)}{" "}
+            <span className='text-base font-normal'>USDT</span>
           </p>
         )}
       </div>
 
       {/* Participants */}
-      <div className="text-right">
-        <p className="text-white/60 text-xs uppercase tracking-wide">{t.stats.participants}</p>
+      <div className='text-right'>
+        <p className='text-white/60 text-xs uppercase tracking-wide'>
+          {t.stats.participants}
+        </p>
         {isLoading ? (
-          <div className="h-8 w-16 bg-white/20 animate-pulse rounded ml-auto" />
+          <div className='h-8 w-16 bg-white/20 animate-pulse rounded ml-auto' />
         ) : (
-          <p className="text-[#D99739] font-bold text-2xl">{formatNumber(participants)}</p>
+          <p className='text-[#D99739] font-bold text-2xl'>
+            {formatNumber(participants)}
+          </p>
         )}
       </div>
     </div>

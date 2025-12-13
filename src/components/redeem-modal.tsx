@@ -42,7 +42,7 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           onChange={setQuantity}
           min={1}
           max={maxTickets || 10}
-          label={t.modals.redeem.quantity}
+          label={quantity > 1 ? 'Tickets' : 'Ticket'}
         />
 
         {/* Balance Info */}
@@ -59,7 +59,7 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
 
         {/* Total Cost */}
         <div className="flex justify-between items-center py-3 border-t border-gray-100">
-          <span className="text-text-muted">{t.modals.redeem.ticketPrice}</span>
+          <span className="text-text-muted">Total</span>
           <span className="text-xl font-bold text-text-dark">{formatNumber(totalCost)} HOOPX</span>
         </div>
 
