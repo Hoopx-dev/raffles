@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletContextProvider } from './wallet-provider';
 import { AuthProvider } from './auth-provider';
+import { StagingBadge } from './staging-badge';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +22,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           {children}
+          <StagingBadge />
         </QueryClientProvider>
       </AuthProvider>
     </WalletContextProvider>
