@@ -90,7 +90,7 @@ export function Header() {
           </h1>
 
           {/* Subtitle */}
-          <p className='text-white/90 text-lg font-medium mt-6'>
+          <p className='text-white/90 text-lg font-medium mt-1'>
             {t.header.subtitle}
           </p>
         </div>
