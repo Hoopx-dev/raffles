@@ -9,11 +9,12 @@ interface PrizeProgressProps {
   nextTierTickets: number;
   nextTierPrize: number;
   isLoading?: boolean;
+  isMaxTier?: boolean;
 }
 
-export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize, isLoading }: PrizeProgressProps) {
+export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize, isLoading, isMaxTier }: PrizeProgressProps) {
   const { t } = useTranslation();
-  const progress = Math.min((currentTickets / nextTierTickets) * 100, 100);
+  const progress = isMaxTier ? 100 : Math.min((currentTickets / nextTierTickets) * 100, 100);
 
   if (isLoading) {
     return (
@@ -30,8 +31,10 @@ export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize, 
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Badge variant="next">{t.progress.next}</Badge>
-          <span className="text-white/90 text-sm font-medium">{t.progress.unlockHigherPrize}</span>
+          <Badge variant={isMaxTier ? 'max' : 'next'}>{isMaxTier ? 'MAX' : t.progress.next}</Badge>
+          <span className="text-white/90 text-sm font-medium">
+            {isMaxTier ? 'Highest Prize Pool Unlocked!' : t.progress.unlockHigherPrize}
+          </span>
         </div>
         <span className="text-white font-bold">
           {formatNumber(nextTierPrize)} <span className="text-white/70 text-sm font-normal">USDT</span>

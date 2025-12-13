@@ -28,7 +28,7 @@ export function useHomeData() {
 export function getNextTier(
   currentTickets: number,
   tiers: PrizePoolTier[]
-): { nextTierTickets: number; nextTierPrize: number } | null {
+): { nextTierTickets: number; nextTierPrize: number; isMaxTier: boolean } | null {
   // Sort tiers by minTickets ascending
   const sortedTiers = [...tiers].sort((a, b) => a.minTickets - b.minTickets);
 
@@ -38,6 +38,7 @@ export function getNextTier(
       return {
         nextTierTickets: tier.minTickets,
         nextTierPrize: tier.poolAmount,
+        isMaxTier: false,
       };
     }
   }
@@ -48,6 +49,7 @@ export function getNextTier(
     return {
       nextTierTickets: highestTier.minTickets,
       nextTierPrize: highestTier.poolAmount,
+      isMaxTier: true,
     };
   }
 

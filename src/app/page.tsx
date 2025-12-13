@@ -67,6 +67,7 @@ export default function Home() {
           nextTierTickets={nextTier?.nextTierTickets || 1000}
           nextTierPrize={nextTier?.nextTierPrize || 20000}
           isLoading={isHomeLoading}
+          isMaxTier={nextTier?.isMaxTier}
         />
 
         {/* Tab Navigation */}

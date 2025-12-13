@@ -12,6 +12,7 @@ const badgeVariants = cva(
         unbet: "bg-unbet text-white",
         bet: "bg-bet text-white",
         next: "bg-[#D99739] text-[#91000A]",
+        max: "bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-[#91000A]",
         count: "bg-[#D99739] text-[#91000A] text-[10px] px-2 py-0.5 rounded-full",
       },
     },
