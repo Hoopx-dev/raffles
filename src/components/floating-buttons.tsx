@@ -1,32 +1,42 @@
 'use client';
 
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useEventStatus } from '@/lib/hooks/useHomeData';
+import { getHoopxBalance } from '@/lib/solana/burnTokens';
 import { useEffect } from 'react';
 
 export function FloatingButtons() {
   const { connected, publicKey } = useWallet();
+  const { connection } = useConnection();
   const { setVisible } = useWalletModal();
   const { openInfoModal, openRedeemModal } = useUIStore();
   const { setAddress, clearAddress, setHoopxBalance } = useWalletStore();
   const { t } = useTranslation();
   const { isEventEnded } = useEventStatus();
 
-  // Sync wallet connection state
+  // Sync wallet connection state and fetch balance
   useEffect(() => {
     if (connected && publicKey) {
       setAddress(publicKey.toBase58());
-      // TODO: Replace with real balance fetch from API
-      // Set dummy balance for testing (100,000 HOOPX)
-      setHoopxBalance(100000);
+
+      // Fetch real HOOPX balance
+      getHoopxBalance(connection, publicKey)
+        .then((balance) => {
+          console.log('HOOPX balance:', balance);
+          setHoopxBalance(balance);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch HOOPX balance:', error);
+          setHoopxBalance(0);
+        });
     } else {
       clearAddress();
     }
-  }, [connected, publicKey, setAddress, clearAddress, setHoopxBalance]);
+  }, [connected, publicKey, connection, setAddress, clearAddress, setHoopxBalance]);
 
   const handleButtonClick = () => {
     if (connected) {

@@ -57,11 +57,25 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           </div>
         </div>
 
-        {/* Total Cost */}
-        <div className="flex justify-between items-center py-3 border-t border-gray-100">
-          <span className="text-text-muted">Total</span>
-          <span className="text-xl font-bold text-text-dark">{formatNumber(totalCost)} HOOPX</span>
-        </div>
+        {/* Total Cost or Insufficient Balance Warning */}
+        {hasEnoughBalance ? (
+          <div className="flex justify-between items-center py-3 border-t border-gray-100">
+            <span className="text-text-muted">Total</span>
+            <span className="text-xl font-bold text-text-dark">{formatNumber(totalCost)} HOOPX</span>
+          </div>
+        ) : (
+          <div className="py-3 border-t border-gray-100">
+            <p className="text-red-500 text-sm mb-1">Please swap HOOPX in Jupiter first</p>
+            <a
+              href="https://jup.ag/tokens/9GhjesUhxmVo9x4UHpdS6NVi4TGzcx8BtGckUqFrjupx"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary font-medium text-sm hover:underline cursor-pointer"
+            >
+              Trade here »
+            </a>
+          </div>
+        )}
 
         {/* Redeem Button */}
         <Button

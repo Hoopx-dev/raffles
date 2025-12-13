@@ -7,6 +7,7 @@ import {
 import {
   createTransferInstruction,
   getAssociatedTokenAddress,
+  getAccount,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 
@@ -119,4 +120,31 @@ export async function burnHoopxTokens({
 export function getConnection(): Connection {
   const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl('mainnet-beta');
   return new Connection(rpcUrl, 'confirmed');
+}
+
+/**
+ * Get HOOPX token balance for a wallet
+ */
+export async function getHoopxBalance(
+  connection: Connection,
+  walletPublicKey: PublicKey
+): Promise<number> {
+  try {
+    const tokenAccount = await getAssociatedTokenAddress(
+      HOOPX_MINT,
+      walletPublicKey
+    );
+
+    const account = await getAccount(connection, tokenAccount);
+
+    // HOOPX has 6 decimals
+    const HOOPX_DECIMALS = 6;
+    const balance = Number(account.amount) / Math.pow(10, HOOPX_DECIMALS);
+
+    return balance;
+  } catch (error) {
+    // Token account doesn't exist or other error - return 0
+    console.log('Could not fetch HOOPX balance:', error);
+    return 0;
+  }
 }
