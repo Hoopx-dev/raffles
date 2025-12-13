@@ -3,7 +3,7 @@ import { fetchGamesByDate, processGame, groupGamesByDate, calculateCumulativeSco
 import { NBAGameRaw, ProcessedGame } from '@/lib/nba/types';
 
 export async function GET() {
-  const apiKey = process.env.SPORTSDATA_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_SPORTSDATA_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json(
