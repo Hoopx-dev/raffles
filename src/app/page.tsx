@@ -39,9 +39,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen pb-24 max-w-[860px] mx-auto">
-      {/* Lucky Prize Banner - fixed at top */}
-      <LuckyPrizeBanner />
-
       {/* Header section with subtle gradient */}
       <div className="relative overflow-hidden bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/bg-header.png)' }}>
         {/* Snow animation covering entire purple section */}
@@ -64,6 +61,9 @@ export default function Home() {
             nextTierPrize={DUMMY_STATS.nextTierPrize}
           />
         </div>
+
+        {/* Lucky Prize Banner - under unlock card */}
+        <LuckyPrizeBanner />
 
         {/* Tab Navigation */}
         <TabNavigation />

@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { useWalletStore } from '@/lib/store/useWalletStore';
-import { useTranslation } from '@/i18n/useTranslation';
+import { useTranslation } from "@/i18n/useTranslation";
+import { useWalletStore } from "@/lib/store/useWalletStore";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useEffect, useRef, useState } from "react";
 
 export function Header() {
   const { t } = useTranslation();
@@ -18,12 +17,15 @@ export function Header() {
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleWalletClick = () => {
@@ -40,27 +42,27 @@ export function Header() {
   };
 
   return (
-    <header className="relative">
+    <header className='relative pt-10'>
       {/* Content */}
-      <div className="relative z-10 px-4 pt-2 pb-6">
+      <div className='relative z-10 px-4 pt-2 pb-6'>
         {/* Top bar: Wallet */}
-        <div className="flex justify-end items-center gap-2 -mb-2">
+        <div className='flex justify-end items-center gap-2 -mb-2'>
           {/* Wallet Button - only show when connected */}
           {connected && (
-            <div className="relative" ref={dropdownRef}>
+            <div className='relative' ref={dropdownRef}>
               <button
                 onClick={handleWalletClick}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-white/20 text-white hover:bg-white/30"
+                className='px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-white/20 text-white hover:bg-white/30'
               >
                 {truncatedAddress}
               </button>
 
               {/* Dropdown */}
               {showDropdown && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[120px] z-50">
+                <div className='absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[120px] z-50'>
                   <button
                     onClick={handleDisconnect}
-                    className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer"
+                    className='w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer'
                   >
                     Disconnect
                   </button>
@@ -70,21 +72,18 @@ export function Header() {
           )}
         </div>
 
-        {/* Logo */}
-        <div className="flex flex-col items-center">
-          <Image
-            src="/images/heading.png"
-            alt="NBA Christmas 2025"
-            width={336}
-            height={168}
-            priority
-            className="object-contain animate-float"
-          />
+        {/* Title */}
+        <div className='flex flex-col items-center'>
+          <h1 className='text-4xl md:text-5xl font-bold text-white text-center animate-float drop-shadow-lg'>
+            HoopXmas
+            <br />
+            <span className='text-gold'>Raffle Ticket</span>
+          </h1>
 
           {/* Subtitle */}
-          <h1 className="text-white/90 text-lg font-medium mt-2">
+          <p className='text-white/90 text-lg font-medium mt-6'>
             {t.header.subtitle}
-          </h1>
+          </p>
         </div>
       </div>
     </header>

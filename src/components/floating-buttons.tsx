@@ -11,17 +11,20 @@ export function FloatingButtons() {
   const { connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
   const { openInfoModal, openRedeemModal } = useUIStore();
-  const { setAddress, clearAddress } = useWalletStore();
+  const { setAddress, clearAddress, setHoopxBalance } = useWalletStore();
   const { t } = useTranslation();
 
   // Sync wallet connection state
   useEffect(() => {
     if (connected && publicKey) {
       setAddress(publicKey.toBase58());
+      // TODO: Replace with real balance fetch from API
+      // Set dummy balance for testing (100,000 HOOPX)
+      setHoopxBalance(100000);
     } else {
       clearAddress();
     }
-  }, [connected, publicKey, setAddress, clearAddress]);
+  }, [connected, publicKey, setAddress, clearAddress, setHoopxBalance]);
 
   const handleButtonClick = () => {
     if (connected) {
