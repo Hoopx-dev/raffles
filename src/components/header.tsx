@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslation } from "@/i18n/useTranslation";
-import { useWalletStore } from "@/lib/store/useWalletStore";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useWalletStore } from "@/lib/store/useWalletStore";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useRef, useState } from "react";
@@ -50,7 +50,7 @@ export function Header() {
   };
 
   return (
-    <header className='relative pt-10'>
+    <header className='relative'>
       {/* Content */}
       <div className='relative z-10 px-4 pt-2 pb-6'>
         {/* Top bar: Wallet */}
@@ -73,7 +73,7 @@ export function Header() {
                     disabled={isLoggingOut}
                     className='w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
                   >
-                    {isLoggingOut ? 'Logging out...' : 'Logout'}
+                    {isLoggingOut ? "Logging out..." : "Logout"}
                   </button>
                 </div>
               )}
@@ -82,7 +82,7 @@ export function Header() {
         </div>
 
         {/* Title */}
-        <div className='flex flex-col items-center'>
+        <div className='flex flex-col items-center pt-10'>
           <h1 className='text-4xl md:text-5xl font-bold text-white text-center animate-float drop-shadow-lg'>
             HoopXmas
             <br />
