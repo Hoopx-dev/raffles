@@ -7,7 +7,9 @@ import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useEventStatus } from '@/lib/hooks/useHomeData';
 import { getHoopxBalance } from '@/lib/solana/burnTokens';
-import { useEffect } from 'react';
+import { isMobileDevice } from '@/lib/utils/mobile-deeplink';
+import MobileWalletModal from './mobile-wallet-modal';
+import { useEffect, useState } from 'react';
 
 export function FloatingButtons() {
   const { connected, publicKey } = useWallet();
@@ -17,6 +19,7 @@ export function FloatingButtons() {
   const { setAddress, clearAddress, setHoopxBalance } = useWalletStore();
   const { t } = useTranslation();
   const { isEventEnded } = useEventStatus();
+  const [showMobileModal, setShowMobileModal] = useState(false);
 
   // Sync wallet connection state and fetch balance
   useEffect(() => {
@@ -38,16 +41,34 @@ export function FloatingButtons() {
     }
   }, [connected, publicKey, connection, setAddress, clearAddress, setHoopxBalance]);
 
+  // Close mobile modal when connected
+  useEffect(() => {
+    if (connected && showMobileModal) {
+      setShowMobileModal(false);
+    }
+  }, [connected, showMobileModal]);
+
   const handleButtonClick = () => {
     if (connected) {
       openRedeemModal();
     } else {
-      setVisible(true);
+      // On mobile, show custom modal; on desktop, show standard modal
+      if (isMobileDevice()) {
+        setShowMobileModal(true);
+      } else {
+        setVisible(true);
+      }
     }
   };
 
   return (
     <>
+      {/* Mobile Wallet Modal */}
+      <MobileWalletModal
+        isOpen={showMobileModal}
+        onClose={() => setShowMobileModal(false)}
+      />
+
       {/* Info Button */}
       <button
         onClick={openInfoModal}
