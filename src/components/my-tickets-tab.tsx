@@ -4,6 +4,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useTabStore } from '@/lib/store/useTabStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useHomeData } from '@/lib/hooks/useHomeData';
 import { useTicketList, useTicketCounts } from '@/lib/hooks/useTickets';
 import { SubTabs } from './ui/tabs';
 import { UnbetTicketCard } from './unbet-ticket-card';
@@ -14,6 +15,10 @@ export function MyTicketsTab() {
   const { ticketSubTab, setTicketSubTab } = useTabStore();
   const openRedeemModal = useUIStore((s) => s.openRedeemModal);
   const { t } = useTranslation();
+
+  // Get event ID from home data
+  const { data: homeData } = useHomeData();
+  const eventId = homeData?.eventInfo?.id;
 
   // Fetch counts first to determine which tabs to show
   const { data: counts, isLoading: countsLoading } = useTicketCounts();
@@ -123,7 +128,7 @@ export function MyTicketsTab() {
       <div className="space-y-4">
         {tickets.map((ticket) =>
           ticket.status === 'UNUSED' ? (
-            <UnbetTicketCard key={ticket.id} ticket={ticket} />
+            <UnbetTicketCard key={ticket.id} ticket={ticket} eventId={eventId} />
           ) : (
             <BetTicketCard key={ticket.id} ticket={ticket} />
           )

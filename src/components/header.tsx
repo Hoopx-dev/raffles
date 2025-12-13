@@ -6,6 +6,7 @@ import { useHomeData } from "@/lib/hooks/useHomeData";
 import { useWalletStore } from "@/lib/store/useWalletStore";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
 interface TimeRemaining {
@@ -41,6 +42,7 @@ export function Header() {
   const { truncatedAddress } = useWalletStore();
   const { logout } = useAuth();
   const { data: homeData } = useHomeData();
+  const queryClient = useQueryClient();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(
@@ -90,6 +92,8 @@ export function Header() {
     setIsLoggingOut(true);
     try {
       await logout();
+      // Clear all React Query caches (tickets, counts, etc.)
+      queryClient.clear();
     } finally {
       setIsLoggingOut(false);
       setShowDropdown(false);

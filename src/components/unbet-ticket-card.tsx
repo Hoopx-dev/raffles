@@ -49,9 +49,11 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
     const home = parseInt(homeScore, 10);
     const away = parseInt(awayScore, 10);
 
+    console.log('Placing ticket with:', { eventId, ticketId: ticket.id, predictHomeScore: home, predictAwayScore: away });
+
     placeTicket(
       {
-        eventId,
+        eventId: eventId || 1,
         ticketId: ticket.id,
         predictHomeScore: home,
         predictAwayScore: away,
