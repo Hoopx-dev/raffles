@@ -1,18 +1,24 @@
 'use client';
 
+import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTabStore } from '@/lib/store/useTabStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { useTicketList, useTicketCounts } from '@/lib/hooks/useTickets';
+import { isMobileDevice } from '@/lib/utils/mobile-deeplink';
+import MobileWalletModal from './mobile-wallet-modal';
 import { SubTabs } from './ui/tabs';
 import { UnbetTicketCard } from './unbet-ticket-card';
 import { BetTicketCard } from './bet-ticket-card';
 
 export function MyTicketsTab() {
   const { connected } = useWallet();
+  const { setVisible } = useWalletModal();
   const { ticketSubTab, setTicketSubTab } = useTabStore();
+  const [showMobileModal, setShowMobileModal] = useState(false);
   const openRedeemModal = useUIStore((s) => s.openRedeemModal);
   const { t } = useTranslation();
 
@@ -45,24 +51,32 @@ export function MyTicketsTab() {
     (t) => t.status === 'UNUSED' || t.status === 'PLACED' || t.status === 'EXPIRED'
   );
 
+  const handleConnect = () => {
+    if (isMobileDevice()) {
+      setShowMobileModal(true);
+    } else {
+      setVisible(true);
+    }
+  };
+
   // Not connected state
   if (!connected) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4">
-        <p className="text-white/60 text-center mb-2">{t.tickets.pleaseConnect}</p>
-        <button
-          className="text-primary underline font-medium cursor-pointer"
-          onClick={() => {
-            // This will be handled by the main wallet button
-            const walletButton = document.querySelector('[data-wallet-button]');
-            if (walletButton instanceof HTMLElement) {
-              walletButton.click();
-            }
-          }}
-        >
-          {t.tickets.connectNow}
-        </button>
-      </div>
+      <>
+        <MobileWalletModal
+          isOpen={showMobileModal}
+          onClose={() => setShowMobileModal(false)}
+        />
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <p className="text-white/60 text-center mb-2">{t.tickets.pleaseConnect}</p>
+          <button
+            className="text-primary underline font-medium cursor-pointer"
+            onClick={handleConnect}
+          >
+            {t.tickets.connectNow}
+          </button>
+        </div>
+      </>
     );
   }
 

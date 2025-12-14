@@ -4,6 +4,7 @@
   },
   "stats": {
     "currentPrizePool": "CURRENT PRIZE POOL",
+    "totalPrizePool": "TOTAL PRIZE POOL",
     "participants": "PARTICIPANTS"
   },
   "progress": {

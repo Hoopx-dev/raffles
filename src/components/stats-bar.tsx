@@ -7,12 +7,14 @@ interface StatsBarProps {
   prizePool: number;
   participants: number;
   isLoading?: boolean;
+  isEventEnded?: boolean;
 }
 
 export function StatsBar({
   prizePool,
   participants,
   isLoading,
+  isEventEnded,
 }: StatsBarProps) {
   const { t } = useTranslation();
 
@@ -21,7 +23,7 @@ export function StatsBar({
       {/* Prize Pool */}
       <div>
         <p className='text-white/60 text-xs uppercase tracking-wide'>
-          {t.stats.currentPrizePool}
+          {isEventEnded ? t.stats.totalPrizePool : t.stats.currentPrizePool}
         </p>
         {isLoading ? (
           <div className='h-8 w-24 bg-white/20 animate-pulse rounded' />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useTicketList } from '@/lib/hooks/useTickets';
 import { useCumulativeScore } from '@/lib/nba/hooks';
 
@@ -29,7 +30,7 @@ export function WonModal({ isOpen, onClose }: WonModalProps) {
     0
   );
 
-  // Actual scores
+  // Actual scores from cumulative score
   const actualHomeScore = cumulativeScore?.homeTeams || 0;
   const actualAwayScore = cumulativeScore?.awayTeams || 0;
 
@@ -151,7 +152,7 @@ export function WonModal({ isOpen, onClose }: WonModalProps) {
   );
 }
 
-// Key for localStorage to track if user has seen the modal
+// Key for sessionStorage to track if user has seen the modal
 const WON_MODAL_SEEN_KEY = 'hoopx_won_modal_seen';
 
 /**
@@ -160,7 +161,9 @@ const WON_MODAL_SEEN_KEY = 'hoopx_won_modal_seen';
  */
 export function useWonModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [hasChecked, setHasChecked] = useState(false);
+  const [shownTicketIds, setShownTicketIds] = useState<string | null>(null);
+  const [manualClose, setManualClose] = useState(false);
+  const { connected } = useWallet();
   const { data: ticketData, isLoading } = useTicketList('PLACED');
 
   // Find winning tickets
@@ -168,28 +171,44 @@ export function useWonModal() {
     (t) => t.placementInfo?.winStatus === 1
   );
 
+  // Get current winning ticket IDs as string
+  const currentWinningIds = winningTickets.length > 0
+    ? winningTickets.map(t => t.id).sort().join(',')
+    : '';
+
   useEffect(() => {
-    // Only check once after tickets are loaded
-    if (isLoading || hasChecked) return;
+    // Don't show if not connected
+    if (!connected) return;
 
-    setHasChecked(true);
+    // Don't reopen if manually closed
+    if (manualClose) return;
 
-    // Check if user has winning tickets
+    // Wait for tickets to load
+    if (isLoading) return;
+
+    // No winning tickets
     if (winningTickets.length === 0) return;
 
-    // Check if modal was already shown this session
+    // Check if we've already shown for these tickets
     const seenTicketIds = sessionStorage.getItem(WON_MODAL_SEEN_KEY);
-    const currentWinningIds = winningTickets.map(t => t.id).sort().join(',');
 
-    // Show modal if there are new winning tickets
-    if (seenTicketIds !== currentWinningIds) {
+    // Show modal if there are new winning tickets we haven't shown yet
+    if (currentWinningIds && currentWinningIds !== seenTicketIds && currentWinningIds !== shownTicketIds) {
       setIsOpen(true);
+      setShownTicketIds(currentWinningIds);
       sessionStorage.setItem(WON_MODAL_SEEN_KEY, currentWinningIds);
     }
-  }, [isLoading, hasChecked, winningTickets]);
+  }, [connected, isLoading, winningTickets, currentWinningIds, shownTicketIds, manualClose]);
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const openModal = () => {
+    setManualClose(false);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setManualClose(true);
+  };
 
   return {
     isOpen,

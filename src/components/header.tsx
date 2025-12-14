@@ -45,9 +45,7 @@ export function Header() {
   const queryClient = useQueryClient();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(
-    null
-  );
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside

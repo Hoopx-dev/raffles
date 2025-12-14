@@ -14,15 +14,19 @@ import { SnowAnimation } from "@/components/snow-animation";
 import { StatsBar } from "@/components/stats-bar";
 import { TabNavigation } from "@/components/tab-navigation";
 import { Toast } from "@/components/ui/toast";
+import { WonCard } from "@/components/won-card";
 import { WonModal, useWonModal } from "@/components/won-modal";
 import { useTabStore } from "@/lib/store/useTabStore";
-import { useHomeData, getNextTier } from "@/lib/hooks/useHomeData";
+import { useHomeData, getNextTier, useEventStatus } from "@/lib/hooks/useHomeData";
+import { useTicketList } from "@/lib/hooks/useTickets";
 import { useState } from "react";
 
 export default function Home() {
   const { mainTab } = useTabStore();
   const { data: homeData, isLoading: isHomeLoading } = useHomeData();
+  const { isEventEnded } = useEventStatus();
   const { isOpen: isWonModalOpen, closeModal: closeWonModal } = useWonModal();
+  const { data: ticketData } = useTicketList('PLACED');
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error" | "info";
@@ -36,6 +40,14 @@ export default function Home() {
   const nextTier = eventInfo
     ? getNextTier(eventInfo.totalTicketsPlaced, poolTiers)
     : null;
+
+  // Check if user has winning tickets
+  const hasWinningTickets = (ticketData?.records || []).some(
+    (t) => t.placementInfo?.winStatus === 1
+  );
+
+  // Show WonCard if event ended and user has winning tickets
+  const showWonCard = isEventEnded && hasWinningTickets;
 
   const handleRedeemSuccess = () => {
     setToast({
@@ -62,16 +74,21 @@ export default function Home() {
           prizePool={eventInfo?.currentPrizePool || 0}
           participants={eventInfo?.totalTicketsPlaced || 0}
           isLoading={isHomeLoading}
+          isEventEnded={isEventEnded}
         />
 
-        {/* Prize Progress */}
-        <PrizeProgress
-          currentTickets={eventInfo?.totalTicketsPlaced || 0}
-          nextTierTickets={nextTier?.nextTierTickets || 1000}
-          nextTierPrize={nextTier?.nextTierPrize || 20000}
-          isLoading={isHomeLoading}
-          isMaxTier={nextTier?.isMaxTier}
-        />
+        {/* Prize Progress or Won Card */}
+        {showWonCard ? (
+          <WonCard />
+        ) : (
+          <PrizeProgress
+            currentTickets={eventInfo?.totalTicketsPlaced || 0}
+            nextTierTickets={nextTier?.nextTierTickets || 1000}
+            nextTierPrize={nextTier?.nextTierPrize || 20000}
+            isLoading={isHomeLoading}
+            isMaxTier={nextTier?.isMaxTier}
+          />
+        )}
 
         {/* Lucky Prize Banner */}
         <LuckyPrizeBanner />
