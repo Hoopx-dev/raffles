@@ -32,11 +32,16 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
   const openLuckyNumberModal = useUIStore((s) => s.openLuckyNumberModal);
 
   const isLucky = !!placement?.luckyStatus;
+  const luckyNumbers = placement?.eggReward?.luckyNumbers || [];
+
+  // Check which score is the lucky number
+  const isHomeLucky = isLucky && luckyNumbers.includes(placement?.predictHomeScore ?? -1);
+  const isAwayLucky = isLucky && luckyNumbers.includes(placement?.predictAwayScore ?? -1);
 
   const handleCardClick = () => {
     if (isLucky && placement) {
-      // Show the lucky number modal with the prediction that hit
-      openLuckyNumberModal([placement.predictHomeScore]);
+      // Show the lucky number modal with the actual lucky numbers from eggReward
+      openLuckyNumberModal(luckyNumbers.length > 0 ? luckyNumbers : [placement.predictHomeScore]);
     }
   };
 
@@ -60,7 +65,7 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
         <div className="flex items-center justify-center gap-6">
           {/* Home Score */}
           <div className="text-center flex-1">
-            <p className={`text-4xl font-bold ${isLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
+            <p className={`text-4xl font-bold ${isHomeLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
               {placement.predictHomeScore}
             </p>
             <p className="text-text-muted text-xs uppercase tracking-wider mt-1">{t.cumulative.homeTeams}</p>
@@ -71,7 +76,9 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
 
           {/* Away Score */}
           <div className="text-center flex-1">
-            <p className="text-4xl font-bold text-text-dark">{placement.predictAwayScore}</p>
+            <p className={`text-4xl font-bold ${isAwayLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
+              {placement.predictAwayScore}
+            </p>
             <p className="text-text-muted text-xs uppercase tracking-wider mt-1">{t.cumulative.awayTeams}</p>
           </div>
         </div>

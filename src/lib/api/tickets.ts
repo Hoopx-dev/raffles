@@ -11,57 +11,6 @@ interface ApiResponse<T> {
 export type TicketStatus = 'UNUSED' | 'PLACED' | 'EXPIRED' | 'ALL';
 export type ClaimStatus = 'UNCLAIMED' | 'CLAIMED';
 
-export interface TicketPlacementInfo {
-  luckyStatus: number; // 0-not lucky, 1-lucky winner
-  predictHomeScore: number;
-  predictAwayScore: number;
-  winStatus: number; // 0-ongoing, 1-won, 2-lost
-  prizeAmount: number;
-  settledTime: string | null;
-  claimStatus: ClaimStatus;
-  claimTime: string | null;
-  txHash?: string; // transaction hash for claimed prizes
-}
-
-export interface UserTicket {
-  id: number;
-  ticketCode: string;
-  source: string;
-  status: 'UNUSED' | 'PLACED' | 'EXPIRED';
-  createTime: string;
-  expireTime: string;
-  placementInfo: TicketPlacementInfo | null;
-}
-
-export interface TicketListResponse {
-  records: UserTicket[];
-  total: number;
-  size: number;
-  current: number;
-  pages: number;
-}
-
-export interface TicketCounts {
-  unusedCount: number;
-  placedCount: number;
-  expiredCount: number;
-}
-
-export interface TicketRedeemParams {
-  eventId: number;
-  txHash: string;
-  userWallet: string;
-  amountToken: number;
-  ticketQuantity: number;
-}
-
-export interface PlacementParams {
-  eventId: number;
-  ticketId: number;
-  predictHomeScore: number;
-  predictAwayScore: number;
-}
-
 export interface LuckyEggRewardRaw {
   success: boolean;
   hitCount: number;
@@ -100,6 +49,105 @@ function parseLuckyEggReward(raw: LuckyEggRewardRaw | null): LuckyEggReward | nu
     hitCount: raw.hitCount,
     luckyNumbers,
   };
+}
+
+export interface TicketPlacementInfo {
+  luckyStatus: number; // 0-not lucky, 1-lucky winner
+  predictHomeScore: number;
+  predictAwayScore: number;
+  winStatus: number; // 0-ongoing, 1-won, 2-lost
+  prizeAmount: number;
+  settledTime: string | null;
+  claimStatus: ClaimStatus;
+  claimTime: string | null;
+  txHash?: string; // transaction hash for claimed prizes
+  eggReward?: LuckyEggReward | null; // lucky egg reward info
+}
+
+export interface UserTicket {
+  id: number;
+  ticketCode: string;
+  source: string;
+  status: 'UNUSED' | 'PLACED' | 'EXPIRED';
+  createTime: string;
+  expireTime: string;
+  placementInfo: TicketPlacementInfo | null;
+}
+
+export interface TicketListResponse {
+  records: UserTicket[];
+  total: number;
+  size: number;
+  current: number;
+  pages: number;
+}
+
+// Raw types for API response parsing
+interface TicketPlacementInfoRaw {
+  luckyStatus: number;
+  predictHomeScore: number;
+  predictAwayScore: number;
+  winStatus: number;
+  prizeAmount: number;
+  settledTime: string | null;
+  claimStatus: ClaimStatus;
+  claimTime: string | null;
+  txHash?: string;
+  eggReward?: LuckyEggRewardRaw | null;
+}
+
+interface UserTicketRaw {
+  id: number;
+  ticketCode: string;
+  source: string;
+  status: 'UNUSED' | 'PLACED' | 'EXPIRED';
+  createTime: string;
+  expireTime: string;
+  placementInfo: TicketPlacementInfoRaw | null;
+}
+
+interface TicketListResponseRaw {
+  records: UserTicketRaw[];
+  total: number;
+  size: number;
+  current: number;
+  pages: number;
+}
+
+function parseTicketPlacementInfo(raw: TicketPlacementInfoRaw | null): TicketPlacementInfo | null {
+  if (!raw) return null;
+  return {
+    ...raw,
+    eggReward: parseLuckyEggReward(raw.eggReward || null),
+  };
+}
+
+function parseUserTicket(raw: UserTicketRaw): UserTicket {
+  return {
+    ...raw,
+    placementInfo: parseTicketPlacementInfo(raw.placementInfo),
+  };
+}
+
+export interface TicketCounts {
+  unusedCount: number;
+  placedCount: number;
+  expiredCount: number;
+}
+
+export interface TicketRedeemParams {
+  eventId: number;
+  txHash: string;
+  userWallet: string;
+  amountToken: number;
+  ticketQuantity: number;
+}
+
+export interface PlacementParams {
+  eventId: number;
+  ticketId: number;
+  predictHomeScore: number;
+  predictAwayScore: number;
 }
 
 export interface PlaceTicketResult {
@@ -143,14 +191,18 @@ export async function getTicketList(
     throw new Error(`Failed to get tickets: ${response.status}`);
   }
 
-  const result: ApiResponse<TicketListResponse> = await response.json();
+  const result: ApiResponse<TicketListResponseRaw> = await response.json();
   console.log('getTicketList result:', result);
 
   if (result.code !== 200) {
     throw new Error(result.msg || 'Failed to get tickets');
   }
 
-  return result.data;
+  // Parse eggReward in each ticket's placementInfo
+  return {
+    ...result.data,
+    records: result.data.records.map(parseUserTicket),
+  };
 }
 
 /**
