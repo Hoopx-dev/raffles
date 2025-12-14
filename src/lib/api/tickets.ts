@@ -12,14 +12,15 @@ export type TicketStatus = 'UNUSED' | 'PLACED' | 'EXPIRED' | 'ALL';
 export type ClaimStatus = 'UNCLAIMED' | 'CLAIMED';
 
 export interface TicketPlacementInfo {
-  luckyStatus: boolean;
+  luckyStatus: number; // 0-not lucky, 1-lucky winner
   predictHomeScore: number;
   predictAwayScore: number;
-  winStatus: number; // 0-pending, 1-correct, 2-incorrect
+  winStatus: number; // 0-ongoing, 1-won, 2-lost
   prizeAmount: number;
   settledTime: string | null;
   claimStatus: ClaimStatus;
   claimTime: string | null;
+  txHash?: string; // transaction hash for claimed prizes
 }
 
 export interface UserTicket {

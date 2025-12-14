@@ -14,6 +14,7 @@ import { SnowAnimation } from "@/components/snow-animation";
 import { StatsBar } from "@/components/stats-bar";
 import { TabNavigation } from "@/components/tab-navigation";
 import { Toast } from "@/components/ui/toast";
+import { WonModal, useWonModal } from "@/components/won-modal";
 import { useTabStore } from "@/lib/store/useTabStore";
 import { useHomeData, getNextTier } from "@/lib/hooks/useHomeData";
 import { useState } from "react";
@@ -21,6 +22,7 @@ import { useState } from "react";
 export default function Home() {
   const { mainTab } = useTabStore();
   const { data: homeData, isLoading: isHomeLoading } = useHomeData();
+  const { isOpen: isWonModalOpen, closeModal: closeWonModal } = useWonModal();
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error" | "info";
@@ -96,6 +98,7 @@ export default function Home() {
       />
       <InfoModal />
       <LuckyNumberModal />
+      <WonModal isOpen={isWonModalOpen} onClose={closeWonModal} />
 
       {/* Toast */}
       {toast && (
