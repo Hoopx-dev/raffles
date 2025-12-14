@@ -1,3 +1,5 @@
+import { useWalletStore } from '@/lib/store/useWalletStore';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_HOOPX_API_URL || 'https://a03low.hoopx.gg';
 
 interface ApiResponse<T> {
@@ -5,6 +7,28 @@ interface ApiResponse<T> {
   msg: string;
   data: T;
   timestamp: number;
+}
+
+// Helper to clear token from localStorage when 401 occurs
+function clearStoredToken(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('hoopx_session_token');
+}
+
+// Handle 401 response - clear token and trigger reauth
+function handle401Error(): void {
+  console.log('401 Unauthorized - triggering reauth');
+  clearStoredToken();
+  // Trigger reauth in the store (non-hook access)
+  useWalletStore.getState().triggerReauth();
+}
+
+// Check response for 401 and handle it
+async function checkAuthError(response: Response): Promise<void> {
+  if (response.status === 401) {
+    handle401Error();
+    throw new Error('Session expired. Please sign in again.');
+  }
 }
 
 // Types
@@ -187,6 +211,8 @@ export async function getTicketList(
     headers: getAuthHeaders(token),
   });
 
+  await checkAuthError(response);
+
   if (!response.ok) {
     throw new Error(`Failed to get tickets: ${response.status}`);
   }
@@ -214,6 +240,8 @@ export async function getTicketCounts(token: string): Promise<TicketCounts> {
     headers: getAuthHeaders(token),
   });
 
+  await checkAuthError(response);
+
   if (!response.ok) {
     throw new Error(`Failed to get ticket counts: ${response.status}`);
   }
@@ -235,11 +263,14 @@ export async function redeemTickets(
   token: string,
   params: TicketRedeemParams
 ): Promise<number> {
+  console.log('redeemTickets params:', params);
   const response = await fetch(`${API_BASE_URL}/api/v1/user/tickets/redeem`, {
     method: 'POST',
     headers: getAuthHeaders(token),
     body: JSON.stringify(params),
   });
+
+  await checkAuthError(response);
 
   if (!response.ok) {
     throw new Error(`Failed to redeem tickets: ${response.status}`);
@@ -269,11 +300,14 @@ export async function placeTicket(
   token: string,
   params: PlacementParams
 ): Promise<PlaceTicketResult> {
+  console.log('placeTicket params:', params);
   const response = await fetch(`${API_BASE_URL}/api/v1/user/tickets/place`, {
     method: 'POST',
     headers: getAuthHeaders(token),
     body: JSON.stringify(params),
   });
+
+  await checkAuthError(response);
 
   if (!response.ok) {
     throw new Error(`Failed to place ticket: ${response.status}`);

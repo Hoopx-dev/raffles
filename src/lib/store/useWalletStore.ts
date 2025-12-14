@@ -7,11 +7,14 @@ interface WalletState {
   hoopxBalance: number;
   sessionToken: string | null;
   isAuthenticated: boolean;
+  needsReauth: boolean;
   setAddress: (address: string | null) => void;
   setHoopxBalance: (balance: number) => void;
   setSession: (token: string) => void;
   clearSession: () => void;
   clearAddress: () => void;
+  triggerReauth: () => void;
+  clearReauthFlag: () => void;
 }
 
 /**
@@ -30,6 +33,7 @@ export const useWalletStore = create<WalletState>()(
       hoopxBalance: 0,
       sessionToken: null,
       isAuthenticated: false,
+      needsReauth: false,
 
       setAddress: (address) => set({
         address,
@@ -43,6 +47,7 @@ export const useWalletStore = create<WalletState>()(
       setSession: (token) => set({
         sessionToken: token,
         isAuthenticated: true,
+        needsReauth: false,
       }),
 
       clearSession: () => set({
@@ -56,6 +61,17 @@ export const useWalletStore = create<WalletState>()(
         hoopxBalance: 0,
         sessionToken: null,
         isAuthenticated: false,
+        needsReauth: false,
+      }),
+
+      triggerReauth: () => set({
+        sessionToken: null,
+        isAuthenticated: false,
+        needsReauth: true,
+      }),
+
+      clearReauthFlag: () => set({
+        needsReauth: false,
       }),
     }),
     {

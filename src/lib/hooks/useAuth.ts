@@ -28,7 +28,7 @@ let globalLoginLock = false;
 
 export function useAuth() {
   const { publicKey, signMessage, connected, disconnect } = useWallet();
-  const { setAddress, setSession, clearAddress, clearSession, sessionToken, isAuthenticated } = useWalletStore();
+  const { setAddress, setSession, clearAddress, clearSession, sessionToken, isAuthenticated, needsReauth, clearReauthFlag } = useWalletStore();
   const loginAttempted = useRef(false);
 
   // On mount, restore session from localStorage
@@ -143,6 +143,16 @@ export function useAuth() {
       }
     }
   }, [connected, publicKey, setAddress, setSession, performSiwsLogin]);
+
+  // Handle reauth trigger (e.g., after 401 error)
+  useEffect(() => {
+    if (needsReauth && connected && publicKey && signMessage && !globalLoginLock) {
+      console.log('Reauth triggered, clearing flag and initiating login...');
+      clearReauthFlag();
+      loginAttempted.current = false; // Reset to allow new login attempt
+      performSiwsLogin();
+    }
+  }, [needsReauth, connected, publicKey, signMessage, clearReauthFlag, performSiwsLogin]);
 
   return {
     isAuthenticated,
