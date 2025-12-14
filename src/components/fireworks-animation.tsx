@@ -28,7 +28,7 @@ const COLORS = ['#D4A942', '#FFD700', '#FF6B6B', '#4ECDC4', '#FF69B4', '#87CEEB'
 export function FireworksAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fireworksRef = useRef<Firework[]>([]);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const canvas = canvasRef.current;

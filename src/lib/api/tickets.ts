@@ -62,10 +62,44 @@ export interface PlacementParams {
   predictAwayScore: number;
 }
 
+export interface LuckyEggRewardRaw {
+  success: boolean;
+  hitCount: number;
+  luckyNumbers: string | number[]; // API may return as JSON string "[1,2]" or actual array
+}
+
 export interface LuckyEggReward {
   success: boolean;
   hitCount: number;
   luckyNumbers: number[];
+}
+
+function parseLuckyEggReward(raw: LuckyEggRewardRaw | null): LuckyEggReward | null {
+  if (!raw) return null;
+
+  let luckyNumbers: number[] = [];
+
+  if (raw.luckyNumbers) {
+    // If it's already an array, use it directly
+    if (Array.isArray(raw.luckyNumbers)) {
+      luckyNumbers = raw.luckyNumbers;
+    } else if (typeof raw.luckyNumbers === 'string') {
+      // If it's a string, try to parse it
+      try {
+        luckyNumbers = JSON.parse(raw.luckyNumbers);
+      } catch {
+        // If parsing fails, try to extract numbers
+        const matches = raw.luckyNumbers.match(/\d+/g);
+        luckyNumbers = matches ? matches.map(Number) : [];
+      }
+    }
+  }
+
+  return {
+    success: raw.success,
+    hitCount: raw.hitCount,
+    luckyNumbers,
+  };
 }
 
 export interface PlaceTicketResult {
@@ -169,6 +203,13 @@ export async function redeemTickets(
   return result.data;
 }
 
+interface PlaceTicketResultRaw {
+  success: boolean;
+  placementId: number;
+  eggReward: LuckyEggRewardRaw | null;
+  message: string;
+}
+
 /**
  * Place a bet using a ticket
  */
@@ -186,12 +227,19 @@ export async function placeTicket(
     throw new Error(`Failed to place ticket: ${response.status}`);
   }
 
-  const result: ApiResponse<PlaceTicketResult> = await response.json();
+  const result: ApiResponse<PlaceTicketResultRaw> = await response.json();
   console.log('placeTicket result:', result);
 
-  if (result.code !== 200) {
+  // API returns code 0 or 200 for success
+  if (result.code !== 0 && result.code !== 200) {
     throw new Error(result.msg || 'Failed to place ticket');
   }
 
-  return result.data;
+  // Parse the eggReward to convert luckyNumbers from string to array
+  return {
+    success: result.data.success,
+    placementId: result.data.placementId,
+    eggReward: parseLuckyEggReward(result.data.eggReward),
+    message: result.data.message,
+  };
 }

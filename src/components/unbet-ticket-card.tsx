@@ -63,7 +63,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
           console.log('Place ticket result:', result);
           // Show lucky number modal if hit lucky egg
           if (result.eggReward?.success && result.eggReward.luckyNumbers.length > 0) {
-            openLuckyNumberModal(result.eggReward.luckyNumbers[0]);
+            openLuckyNumberModal(result.eggReward.luckyNumbers);
           }
         },
         onError: (error) => {
@@ -92,27 +92,27 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
           <div className="flex items-start gap-3 mb-4">
             <div className="flex-1">
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 label={t.tickets.homeScore}
                 placeholder="0-1000"
                 value={homeScore}
-                onChange={(e) => setHomeScore(e.target.value)}
+                onChange={(e) => setHomeScore(e.target.value.replace(/[^0-9]/g, ''))}
                 error={errors.home}
-                min={0}
-                max={1000}
               />
             </div>
             <div className="flex items-center justify-center pt-8 text-text-muted text-xl">:</div>
             <div className="flex-1">
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 label={t.tickets.awayScore}
                 placeholder="0-1000"
                 value={awayScore}
-                onChange={(e) => setAwayScore(e.target.value)}
+                onChange={(e) => setAwayScore(e.target.value.replace(/[^0-9]/g, ''))}
                 error={errors.away}
-                min={0}
-                max={1000}
               />
             </div>
           </div>

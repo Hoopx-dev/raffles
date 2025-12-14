@@ -2,7 +2,7 @@
 
 import { UserTicket } from '@/lib/hooks/useTickets';
 import { useTranslation } from '@/i18n/useTranslation';
-import { Badge } from './ui/badge';
+import { useUIStore } from '@/lib/store/useUIStore';
 
 interface BetTicketCardProps {
   ticket: UserTicket;
@@ -29,9 +29,22 @@ function getWinStatusColor(winStatus: number): string {
 export function BetTicketCard({ ticket }: BetTicketCardProps) {
   const { t } = useTranslation();
   const placement = ticket.placementInfo;
+  const openLuckyNumberModal = useUIStore((s) => s.openLuckyNumberModal);
+
+  const isLucky = !!placement?.luckyStatus;
+
+  const handleCardClick = () => {
+    if (isLucky && placement) {
+      // Show the lucky number modal with the prediction that hit
+      openLuckyNumberModal([placement.predictHomeScore]);
+    }
+  };
 
   return (
-    <div className="bg-bg-card-mint rounded-2xl p-4 shadow-sm">
+    <div
+      className={`bg-bg-card-mint rounded-2xl p-4 shadow-sm ${isLucky ? 'cursor-pointer' : ''}`}
+      onClick={isLucky ? handleCardClick : undefined}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <span className="text-text-dark font-bold">{ticket.ticketCode}</span>
@@ -47,7 +60,9 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
         <div className="flex items-center justify-center gap-6">
           {/* Home Score */}
           <div className="text-center flex-1">
-            <p className="text-4xl font-bold text-text-dark">{placement.predictHomeScore}</p>
+            <p className={`text-4xl font-bold ${isLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
+              {placement.predictHomeScore}
+            </p>
             <p className="text-text-muted text-xs uppercase tracking-wider mt-1">{t.cumulative.homeTeams}</p>
           </div>
 
@@ -63,15 +78,20 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
       )}
 
       {/* Lucky Status & Prize */}
-      {placement && (placement.luckyStatus || placement.prizeAmount > 0) && (
-        <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-          {placement.luckyStatus && (
-            <Badge variant="next">Lucky Winner!</Badge>
+      {placement && (!!placement.luckyStatus || placement.prizeAmount > 0) && (
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          {!!placement.luckyStatus && (
+            <div className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#D4A942]/30 to-[#FFD700]/30 px-3 py-2 rounded-full w-full">
+              <span className="text-lg">🎉</span>
+              <span className="text-sm font-bold text-[#D4A942]">Lucky Winner!</span>
+            </div>
           )}
           {placement.prizeAmount > 0 && (
-            <span className="text-sm text-text-muted">
-              Prize: <span className="font-bold text-green-600">{placement.prizeAmount} USDT</span>
-            </span>
+            <div className="text-center mt-2">
+              <span className="text-sm text-text-muted">
+                Prize: <span className="font-bold text-green-600">{placement.prizeAmount} USDT</span>
+              </span>
+            </div>
           )}
         </div>
       )}

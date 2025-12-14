@@ -5,7 +5,7 @@ interface UIState {
   isRedeemModalOpen: boolean;
   isConfirmModalOpen: boolean;
   isLuckyNumberModalOpen: boolean;
-  luckyNumber: number | null;
+  luckyNumbers: number[];
   pendingRedeemAmount: number;
   openInfoModal: () => void;
   closeInfoModal: () => void;
@@ -13,7 +13,7 @@ interface UIState {
   closeRedeemModal: () => void;
   openConfirmModal: (amount: number) => void;
   closeConfirmModal: () => void;
-  openLuckyNumberModal: (number: number) => void;
+  openLuckyNumberModal: (numbers: number[]) => void;
   closeLuckyNumberModal: () => void;
   closeAllModals: () => void;
 }
@@ -23,7 +23,7 @@ export const useUIStore = create<UIState>()((set) => ({
   isRedeemModalOpen: false,
   isConfirmModalOpen: false,
   isLuckyNumberModalOpen: false,
-  luckyNumber: null,
+  luckyNumbers: [],
   pendingRedeemAmount: 1,
 
   openInfoModal: () => set({ isInfoModalOpen: true }),
@@ -41,10 +41,10 @@ export const useUIStore = create<UIState>()((set) => ({
   closeConfirmModal: () =>
     set({ isConfirmModalOpen: false, pendingRedeemAmount: 1 }),
 
-  openLuckyNumberModal: (number) =>
-    set({ isLuckyNumberModalOpen: true, luckyNumber: number }),
+  openLuckyNumberModal: (numbers) =>
+    set({ isLuckyNumberModalOpen: true, luckyNumbers: numbers }),
   closeLuckyNumberModal: () =>
-    set({ isLuckyNumberModalOpen: false, luckyNumber: null }),
+    set({ isLuckyNumberModalOpen: false, luckyNumbers: [] }),
 
   closeAllModals: () =>
     set({

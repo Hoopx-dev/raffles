@@ -29,7 +29,7 @@ function createConfetti(container: HTMLDivElement) {
 }
 
 export function LuckyNumberModal() {
-  const { isLuckyNumberModalOpen, closeLuckyNumberModal, luckyNumber } = useUIStore();
+  const { isLuckyNumberModalOpen, closeLuckyNumberModal, luckyNumbers } = useUIStore();
   const confettiRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
 
@@ -79,10 +79,18 @@ export function LuckyNumberModal() {
         {/* Congratulations */}
         <h2 className="text-2xl font-bold text-text-dark mb-2">{t.modals.lucky.congrats}</h2>
 
-        {/* Lucky Number */}
+        {/* Lucky Numbers */}
         <div className="my-6">
-          <p className="text-text-muted text-sm mb-1">{t.modals.lucky.luckyNumber}</p>
-          <p className="text-5xl font-bold text-orange">{luckyNumber}</p>
+          <p className="text-text-muted text-sm mb-2">
+            {luckyNumbers.length > 1 ? t.modals.lucky.luckyNumbers : t.modals.lucky.luckyNumber}
+          </p>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            {luckyNumbers.map((num, idx) => (
+              <span key={idx} className="text-4xl font-bold text-orange bg-orange/10 px-4 py-2 rounded-xl">
+                #{num}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Prize Info */}
@@ -90,7 +98,14 @@ export function LuckyNumberModal() {
           <p className="text-text-dark font-medium">
             {t.modals.lucky.youWon}
           </p>
-          <p className="text-2xl font-bold text-gold">{t.modals.lucky.prize}</p>
+          <p className="text-2xl font-bold text-gold">
+            {luckyNumbers.length * 10} USDT
+          </p>
+          {luckyNumbers.length > 1 && (
+            <p className="text-text-muted text-xs mt-1">
+              ({luckyNumbers.length} lucky numbers × 10 USDT each)
+            </p>
+          )}
         </div>
 
         {/* Close Button */}

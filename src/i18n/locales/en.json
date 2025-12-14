@@ -90,6 +90,7 @@
     "lucky": {
       "congrats": "Congratulations!",
       "luckyNumber": "Lucky Number",
+      "luckyNumbers": "Lucky Numbers",
       "youWon": "You've hit a lucky number!",
       "prize": "You won 10 USDT!"
     }
