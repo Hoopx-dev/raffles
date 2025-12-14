@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useTicketList } from '@/lib/hooks/useTickets';
@@ -31,7 +31,7 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-export default function WonPage() {
+function WonPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const ticketId = searchParams.get('ticket');
@@ -339,5 +339,17 @@ export default function WonPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function WonPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#91000A] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <WonPageContent />
+    </Suspense>
   );
 }
