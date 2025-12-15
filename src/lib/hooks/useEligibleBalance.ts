@@ -41,7 +41,8 @@ interface HeliusTokenTransfer {
 interface HeliusTransaction {
   signature: string;
   timestamp: number;
-  type: string;
+  type: string; // 'SWAP', 'TRANSFER', etc.
+  source: string; // 'JUPITER', 'RAYDIUM', etc.
   tokenTransfers: HeliusTokenTransfer[];
 }
 
@@ -103,12 +104,29 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
 
       const transactions: HeliusTransaction[] = await response.json();
 
-      // Sum up HOOPX received after cutoff date
+      // Debug: log all transactions
+      console.log('Helius transactions:', transactions.map(tx => ({
+        type: tx.type,
+        source: tx.source,
+        timestamp: new Date(tx.timestamp * 1000).toISOString(),
+        transfers: tx.tokenTransfers?.filter(t => t.mint === HOOPX_MINT).map(t => ({
+          amount: t.tokenAmount,
+          to: t.toUserAccount,
+        })),
+      })));
+
+      // Sum up HOOPX received from SWAP transactions after cutoff date
       let totalSwapped = 0;
 
       for (const tx of transactions) {
         // Skip transactions before cutoff date
         if (tx.timestamp < ELIGIBILITY_CUTOFF_TIMESTAMP) continue;
+
+        // Only count DEX swap transactions (Jupiter, Raydium, Orca, etc.)
+        const DEX_SOURCES = ['JUPITER', 'RAYDIUM', 'ORCA', 'METEORA', 'PHOENIX'];
+        if (!DEX_SOURCES.includes(tx.source)) {
+          continue;
+        }
 
         // Check token transfers for HOOPX received
         for (const transfer of tx.tokenTransfers || []) {
@@ -123,7 +141,7 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
         }
       }
 
-      console.log('Eligible HOOPX swapped:', totalSwapped);
+      console.log('Eligible HOOPX swapped (from SWAP only):', totalSwapped);
 
       return { totalSwapped };
     },
