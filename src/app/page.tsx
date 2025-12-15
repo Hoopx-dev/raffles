@@ -17,7 +17,7 @@ import { Toast } from "@/components/ui/toast";
 import { WonCard } from "@/components/won-card";
 import { WonModal, useWonModal } from "@/components/won-modal";
 import { useTabStore } from "@/lib/store/useTabStore";
-import { useHomeData, getNextTier, useEventStatus } from "@/lib/hooks/useHomeData";
+import { useHomeData, getNextTier, getCurrentPrizePool, useEventStatus } from "@/lib/hooks/useHomeData";
 import { useTicketList } from "@/lib/hooks/useTickets";
 import { useState } from "react";
 
@@ -35,10 +35,16 @@ export default function Home() {
   // Get event info from API
   const eventInfo = homeData?.eventInfo;
   const poolTiers = homeData?.poolTierVOList || [];
+  const totalTickets = eventInfo?.totalTicketsPlaced || 0;
+
+  // Calculate current prize pool from tiers (fallback to API value if tiers empty)
+  const currentPrizePool = poolTiers.length > 0
+    ? getCurrentPrizePool(totalTickets, poolTiers)
+    : (eventInfo?.currentPrizePool || 0);
 
   // Calculate next tier
   const nextTier = eventInfo
-    ? getNextTier(eventInfo.totalTicketsPlaced, poolTiers)
+    ? getNextTier(totalTickets, poolTiers)
     : null;
 
   // Check if user has winning tickets
@@ -71,8 +77,8 @@ export default function Home() {
 
         {/* Stats Bar */}
         <StatsBar
-          prizePool={eventInfo?.currentPrizePool || 0}
-          participants={eventInfo?.totalTicketsPlaced || 0}
+          prizePool={currentPrizePool}
+          participants={totalTickets}
           isLoading={isHomeLoading}
           isEventEnded={isEventEnded}
         />
@@ -82,7 +88,7 @@ export default function Home() {
           <WonCard />
         ) : (
           <PrizeProgress
-            currentTickets={eventInfo?.totalTicketsPlaced || 0}
+            currentTickets={totalTickets}
             nextTierTickets={nextTier?.nextTierTickets || 1000}
             nextTierPrize={nextTier?.nextTierPrize || 20000}
             isLoading={isHomeLoading}

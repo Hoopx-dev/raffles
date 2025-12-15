@@ -23,6 +23,31 @@ export function useHomeData() {
 }
 
 /**
+ * Get the current prize pool based on tickets and tiers
+ * Returns the pool amount for the highest tier that has been reached
+ */
+export function getCurrentPrizePool(
+  currentTickets: number,
+  tiers: PrizePoolTier[]
+): number {
+  if (tiers.length === 0) return 0;
+
+  // Sort tiers by minTickets descending to find highest reached tier
+  const sortedTiers = [...tiers].sort((a, b) => b.minTickets - a.minTickets);
+
+  // Find the highest tier that has been reached
+  for (const tier of sortedTiers) {
+    if (currentTickets >= tier.minTickets) {
+      return tier.poolAmount;
+    }
+  }
+
+  // If no tier reached, return the lowest tier's pool (tier with minTickets = 0)
+  const lowestTier = sortedTiers[sortedTiers.length - 1];
+  return lowestTier?.poolAmount || 0;
+}
+
+/**
  * Get the next prize pool tier based on current tickets
  */
 export function getNextTier(
