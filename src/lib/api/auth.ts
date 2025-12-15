@@ -76,28 +76,3 @@ export function createSiwsMessage(address: string, nonce: string): string {
   return `siws:${domain}:${nonce};action=login;address=${address}`;
 }
 
-/**
- * Logout from SIWS session
- * Note: This is best-effort - local logout will proceed even if backend fails
- */
-export async function siwsLogout(token: string): Promise<void> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    const result: ApiResponse<string> = await response.json();
-    console.log('siwsLogout result:', result);
-
-    if (result.code !== 200) {
-      console.warn('Backend logout returned non-200:', result.msg);
-    }
-  } catch (error) {
-    // Backend logout failed, but we'll still proceed with local logout
-    console.warn('Backend logout request failed:', error);
-  }
-}

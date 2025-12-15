@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletStore } from '@/lib/store/useWalletStore';
-import { getNonce, siwsLogin, createSiwsMessage, siwsLogout } from '@/lib/api/auth';
+import { getNonce, siwsLogin, createSiwsMessage } from '@/lib/api/auth';
+import { queryClient } from '@/components/providers';
 import bs58 from 'bs58';
 
 const SESSION_TOKEN_KEY = 'hoopx_session_token';
@@ -103,27 +104,20 @@ export function useAuth() {
     }
   }, [publicKey, signMessage, setSession, clearSession]);
 
-  const logout = useCallback(async () => {
-    const token = getStoredToken();
-    try {
-      // Call backend logout if we have a session token
-      if (token) {
-        try {
-          await siwsLogout(token);
-        } catch (error) {
-          console.error('Backend logout failed:', error);
-        }
-      }
-    } finally {
-      // Always clear local state
-      clearStoredToken();
-      clearAddress();
-      clearSession();
-      loginAttempted.current = false;
-      globalLoginLock = false;
-      // Disconnect wallet
-      disconnect();
-    }
+  const logout = useCallback(() => {
+    console.log('Logging out - clearing all session data');
+    // Clear localStorage token
+    clearStoredToken();
+    // Clear zustand store state
+    clearAddress();
+    clearSession();
+    // Clear React Query cache
+    queryClient.clear();
+    // Reset login state
+    loginAttempted.current = false;
+    globalLoginLock = false;
+    // Disconnect wallet
+    disconnect();
   }, [clearAddress, clearSession, disconnect]);
 
   // Handle wallet connection changes

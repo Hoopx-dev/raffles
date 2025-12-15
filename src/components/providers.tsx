@@ -6,7 +6,7 @@ import { WalletContextProvider } from './wallet-provider';
 import { AuthProvider } from './auth-provider';
 import { StagingBadge } from './staging-badge';
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
