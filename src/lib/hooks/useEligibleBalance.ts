@@ -9,9 +9,15 @@ import { useTicketList } from './useTickets';
 // ELIGIBILITY CUTOFF DATE - Change this to adjust when swaps become eligible
 // Only HOOPX tokens received AFTER this date can be used for ticket redemption
 // ============================================
-const ELIGIBILITY_CUTOFF_DATE = '2025-12-15T00:00:00Z';
+export const ELIGIBILITY_CUTOFF_DATE = '2025-12-15T00:00:00Z';
 const ELIGIBILITY_CUTOFF_TIMESTAMP = Math.floor(new Date(ELIGIBILITY_CUTOFF_DATE).getTime() / 1000);
 const ELIGIBILITY_CUTOFF_MS = new Date(ELIGIBILITY_CUTOFF_DATE).getTime();
+
+// Formatted date for display (e.g., "Dec 16")
+export const ELIGIBILITY_CUTOFF_DISPLAY = new Date(ELIGIBILITY_CUTOFF_DATE).toLocaleDateString('en-US', {
+  month: 'short',
+  day: 'numeric',
+});
 
 // HOOPX token mint address
 const HOOPX_MINT = process.env.NEXT_PUBLIC_HOOPX_MINT || '11111111111111111111111111111111';

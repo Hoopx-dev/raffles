@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
-import { useEligibleBalance } from '@/lib/hooks/useEligibleBalance';
+import { useEligibleBalance, ELIGIBILITY_CUTOFF_DISPLAY } from '@/lib/hooks/useEligibleBalance';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
 import { QuantitySelector } from './ui/quantity-selector';
@@ -49,7 +49,7 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
     if (isLoadingSwaps) return null;
 
     if (availableQuota === 0) {
-      return 'No eligible HOOPX. You must swap HOOPX after the eligibility date.';
+      return `No eligible HOOPX. Only newly swapped HOOPX after ${ELIGIBILITY_CUTOFF_DISPLAY} can be redeemed.`;
     }
     if (availableQuota < totalCost) {
       return `Insufficient eligible balance. Available: ${formatNumber(availableQuota)} HOOPX`;
