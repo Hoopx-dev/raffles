@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletStore, setGlobalDisconnect } from '@/lib/store/useWalletStore';
 import { getNonce, siwsLogin, createSiwsMessage } from '@/lib/api/auth';
@@ -30,7 +30,6 @@ let globalLoginLock = false;
 export function useAuth() {
   const { publicKey, signMessage, connected, disconnect } = useWallet();
   const { setAddress, setSession, clearAddress, clearSession, sessionToken, isAuthenticated } = useWalletStore();
-  const loginAttempted = useRef(false);
 
   // Register global disconnect function for API 401 handlers
   useEffect(() => {
@@ -47,6 +46,7 @@ export function useAuth() {
 
   const performSiwsLogin = useCallback(async () => {
     if (!publicKey || !signMessage) {
+      console.log('Cannot login: publicKey or signMessage not available');
       return;
     }
 
@@ -65,7 +65,6 @@ export function useAuth() {
     }
 
     globalLoginLock = true;
-    loginAttempted.current = true;
 
     const walletAddress = publicKey.toBase58();
 
@@ -97,13 +96,11 @@ export function useAuth() {
       setStoredToken(token);
       setSession(token);
 
-      console.log('SIWS login successful');
+      console.log('SIWS login successful, token stored');
     } catch (error) {
       console.error('SIWS login failed:', error);
       clearStoredToken();
       clearSession();
-      // Reset attempted flag to allow retry
-      loginAttempted.current = false;
     } finally {
       globalLoginLock = false;
     }
@@ -119,7 +116,6 @@ export function useAuth() {
     // Clear React Query cache
     queryClient.clear();
     // Reset login state
-    loginAttempted.current = false;
     globalLoginLock = false;
     // Disconnect wallet
     disconnect();
@@ -131,14 +127,15 @@ export function useAuth() {
       const walletAddress = publicKey.toBase58();
       setAddress(walletAddress);
 
-      // Only trigger SIWS login if no session token exists and haven't attempted yet
+      // Check if already authenticated or token exists
       const existingToken = getStoredToken();
-      if (!existingToken && !loginAttempted.current && !globalLoginLock) {
-        console.log('No session token, triggering SIWS login...');
-        performSiwsLogin();
-      } else if (existingToken) {
+      if (existingToken) {
         console.log('Session token exists, restoring session');
         setSession(existingToken);
+      } else if (!globalLoginLock) {
+        // No token and not already logging in - trigger login
+        console.log('No session token, triggering SIWS login...');
+        performSiwsLogin();
       }
     }
   }, [connected, publicKey, setAddress, setSession, performSiwsLogin]);

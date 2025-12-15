@@ -21,13 +21,27 @@ interface WalletContextProviderProps {
 }
 
 /**
- * Detect if running on mobile device
+ * Detect if running on actual mobile device (not just narrow viewport)
+ * Uses multiple signals to avoid false positives from responsive design mode
  */
 const isMobile = (): boolean => {
   if (typeof window === "undefined") return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+
+  // Check userAgent for mobile patterns
+  const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
+
+  // Check if it's a touch-only device (no mouse/trackpad)
+  // Desktop browsers in responsive mode still have mouse capability
+  const isTouchOnly = 'ontouchstart' in window && navigator.maxTouchPoints > 0 && !matchMedia('(pointer: fine)').matches;
+
+  // Check for mobile-specific navigator properties
+  const hasMobileProperties = 'standalone' in navigator ||
+    ('userAgentData' in navigator && (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData?.mobile === true);
+
+  // Must have mobile userAgent AND (touch-only OR mobile properties)
+  return mobileUserAgent && (isTouchOnly || hasMobileProperties);
 };
 
 export const WalletContextProvider: FC<WalletContextProviderProps> = ({
