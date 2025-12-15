@@ -5,9 +5,11 @@ import { useWalletStore } from '@/lib/store/useWalletStore';
 import {
   getTicketList,
   getTicketCounts,
+  redeemTicketsPre,
   redeemTickets,
   placeTicket,
   TicketStatus,
+  TicketRedeemPreParams,
   TicketRedeemParams,
   PlacementParams,
   UserTicket,
@@ -63,7 +65,20 @@ export function useTicketCounts() {
 }
 
 /**
- * Hook to redeem/purchase tickets
+ * Hook to create a pre-order for ticket redemption
+ */
+export function useRedeemTicketsPre() {
+  return useMutation({
+    mutationFn: async (params: TicketRedeemPreParams) => {
+      const token = getStoredToken();
+      if (!token) throw new Error('Not authenticated');
+      return redeemTicketsPre(token, params);
+    },
+  });
+}
+
+/**
+ * Hook to redeem/purchase tickets (requires preOrderId from pre-order)
  */
 export function useRedeemTickets() {
   const queryClient = useQueryClient();
@@ -106,6 +121,7 @@ export type {
   TicketCounts,
   TicketStatus,
   PlaceTicketResult,
+  TicketRedeemPreParams,
   TicketRedeemParams,
   PlacementParams,
 };

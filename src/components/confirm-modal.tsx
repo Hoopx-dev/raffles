@@ -5,7 +5,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
-import { useRedeemTickets } from '@/lib/hooks/useTickets';
+import { useRedeemTicketsPre, useRedeemTickets } from '@/lib/hooks/useTickets';
 import { burnHoopxTokens } from '@/lib/solana/burnTokens';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
@@ -37,7 +37,8 @@ export function ConfirmModal({
 
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
-  const { mutate: redeemTickets, isPending: isRedeeming } = useRedeemTickets();
+  const { mutateAsync: createPreOrder } = useRedeemTicketsPre();
+  const { mutate: redeemTickets } = useRedeemTickets();
 
   const totalCost = pendingRedeemAmount * ticketPrice;
   const isProcessing = step === 'burning' || step === 'redeeming';
@@ -55,10 +56,22 @@ export function ConfirmModal({
     }
 
     setError(null);
-    setStep('burning');
 
     try {
-      // Step 1: Burn HOOPX tokens on-chain
+      // Step 1: Create pre-order to get preOrderId
+      const preOrderParams = {
+        eventId,
+        userWallet: address,
+        amountToken: totalCost,
+        ticketQuantity: pendingRedeemAmount,
+      };
+      console.log('Creating pre-order with params:', preOrderParams);
+      const preOrderId = await createPreOrder(preOrderParams);
+      console.log('Pre-order created:', preOrderId);
+
+      setStep('burning');
+
+      // Step 2: Burn HOOPX tokens on-chain
       const burnResult = await burnHoopxTokens({
         connection,
         walletPublicKey: publicKey,
@@ -82,14 +95,13 @@ export function ConfirmModal({
       console.log('Burn transaction:', burnResult.txHash);
       setStep('redeeming');
 
-      // Step 2: Call API to redeem tickets with the real txHash
+      // Step 3: Call API to redeem tickets with txHash and preOrderId
       redeemTickets(
         {
           eventId,
           txHash: burnResult.txHash,
           userWallet: address,
-          amountToken: totalCost,
-          ticketQuantity: pendingRedeemAmount,
+          preOrderId,
         },
         {
           onSuccess: (ticketsCreated) => {

@@ -177,12 +177,18 @@ export interface TicketCounts {
   expiredCount: number;
 }
 
+export interface TicketRedeemPreParams {
+  eventId: number;
+  userWallet: string;
+  amountToken: number;
+  ticketQuantity: number;
+}
+
 export interface TicketRedeemParams {
   eventId: number;
   txHash: string;
   userWallet: string;
-  amountToken: number;
-  ticketQuantity: number;
+  preOrderId: string;
 }
 
 export interface PlacementParams {
@@ -275,7 +281,36 @@ export async function getTicketCounts(token: string): Promise<TicketCounts> {
 }
 
 /**
+ * Create a pre-order for ticket redemption
+ * Returns a preOrderId to be used in the actual redeem call
+ */
+export async function redeemTicketsPre(
+  token: string,
+  params: TicketRedeemPreParams
+): Promise<string> {
+  console.log('redeemTicketsPre params:', params);
+  const response = await fetch(`${API_BASE_URL}/api/v1/user/tickets/redeem_pre`, {
+    method: 'POST',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify(params),
+  });
+
+  await checkAuthError(response);
+
+  const result: ApiResponse<string> = await response.json();
+  console.log('redeemTicketsPre result:', result);
+
+  if (!response.ok || result.code !== 200) {
+    console.error('redeemTicketsPre error:', result);
+    throw new Error(result.msg || `Failed to create pre-order: ${response.status}`);
+  }
+
+  return result.data;
+}
+
+/**
  * Redeem/purchase tickets with HOOPX tokens
+ * Requires a preOrderId from redeemTicketsPre
  */
 export async function redeemTickets(
   token: string,
