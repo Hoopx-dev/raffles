@@ -15,7 +15,7 @@
   "tabs": {
     "liveScores": "LIVE SCORES",
     "myTickets": "MY TICKETS",
-    "unbet": "UNBET",
+    "unbet": "PENDING",
     "bet": "BET"
   },
   "cumulative": {
