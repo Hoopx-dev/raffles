@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
+import { useEligibleBalance } from '@/lib/hooks/useEligibleBalance';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
 import { QuantitySelector } from './ui/quantity-selector';
@@ -21,12 +22,39 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
   const [quantity, setQuantity] = useState(1);
   const { t } = useTranslation();
 
-  const maxTickets = Math.max(1, Math.floor(hoopxBalance / ticketPrice));
+  // Get swap history from Helius - only fetch when modal is open
+  const { availableQuota, isLoading: isLoadingSwaps } = useEligibleBalance(ticketPrice, isRedeemModalOpen);
+
+  // Max tickets based on available quota (min of swapped and wallet balance)
+  const maxTickets = Math.max(1, Math.floor(availableQuota / ticketPrice));
+
   const totalCost = quantity * ticketPrice;
-  const hasEnoughBalance = hoopxBalance >= totalCost;
+
+  // Can redeem if available quota covers the cost
+  const canRedeem = availableQuota >= totalCost;
+
+  // Reset quantity when modal opens
+  useEffect(() => {
+    if (isRedeemModalOpen) {
+      setQuantity(1);
+    }
+  }, [isRedeemModalOpen]);
 
   const handleRedeem = () => {
     openConfirmModal(quantity);
+  };
+
+  const getErrorMessage = () => {
+    // Don't show error while loading
+    if (isLoadingSwaps) return null;
+
+    if (availableQuota === 0) {
+      return 'No eligible HOOPX. You must swap HOOPX after the eligibility date.';
+    }
+    if (availableQuota < totalCost) {
+      return `Insufficient eligible balance. Available: ${formatNumber(availableQuota)} HOOPX`;
+    }
+    return null;
   };
 
   return (
@@ -41,15 +69,21 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           value={quantity}
           onChange={setQuantity}
           min={1}
-          max={maxTickets || 10}
+          max={maxTickets || 1}
           label={quantity > 1 ? 'Tickets' : 'Ticket'}
         />
 
         {/* Balance Info */}
         <div className="space-y-2 bg-bg-input rounded-xl p-4">
           <div className="flex justify-between text-sm">
-            <span className="text-text-muted">{t.modals.redeem.availableBalance}</span>
+            <span className="text-text-muted">Wallet Balance</span>
             <span className="text-text-dark font-medium">{formatNumber(hoopxBalance)} HOOPX</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-muted">Available to Redeem</span>
+            <span className={`font-medium ${availableQuota > 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {isLoadingSwaps ? '...' : `${formatNumber(availableQuota)} HOOPX`}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-muted">Price per ticket</span>
@@ -57,22 +91,22 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           </div>
         </div>
 
-        {/* Total Cost or Insufficient Balance Warning */}
-        {hasEnoughBalance ? (
+        {/* Total Cost or Error Warning */}
+        {canRedeem ? (
           <div className="flex justify-between items-center py-3 border-t border-gray-100">
             <span className="text-text-muted">Total</span>
             <span className="text-xl font-bold text-text-dark">{formatNumber(totalCost)} HOOPX</span>
           </div>
         ) : (
           <div className="py-3 border-t border-gray-100">
-            <p className="text-red-500 text-sm mb-1">Please swap HOOPX in Jupiter first</p>
+            <p className="text-red-500 text-sm mb-1">{getErrorMessage()}</p>
             <a
               href="https://jup.ag/tokens/9GhjesUhxmVo9x4UHpdS6NVi4TGzcx8BtGckUqFrjupx"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-medium text-sm hover:underline cursor-pointer"
             >
-              Trade here »
+              Swap HOOPX on Jupiter »
             </a>
           </div>
         )}
@@ -83,9 +117,9 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           fullWidth
           size="lg"
           onClick={handleRedeem}
-          disabled={!hasEnoughBalance || quantity === 0}
+          disabled={!canRedeem || quantity === 0 || isLoadingSwaps}
         >
-          {t.modals.redeem.redeem} - {formatNumber(totalCost)} HOOPX
+          {isLoadingSwaps ? 'Checking...' : `${t.modals.redeem.redeem} - ${formatNumber(totalCost)} HOOPX`}
         </Button>
       </div>
     </Modal>

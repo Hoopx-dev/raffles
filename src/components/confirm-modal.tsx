@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -46,6 +45,12 @@ export function ConfirmModal({
   const handleConfirm = async () => {
     if (!address || !publicKey || !signTransaction) {
       setError('Wallet not connected');
+      return;
+    }
+
+    // Check wallet balance before burning
+    if (hoopxBalance < totalCost) {
+      setError('Insufficient wallet balance');
       return;
     }
 
