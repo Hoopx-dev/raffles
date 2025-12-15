@@ -15,19 +15,19 @@ function clearStoredToken(): void {
   localStorage.removeItem('hoopx_session_token');
 }
 
-// Handle 401 response - clear token and trigger reauth
+// Handle 401 response - clear token and logout user
 function handle401Error(): void {
-  console.log('401 Unauthorized - triggering reauth');
+  console.log('401 Unauthorized - logging out user');
   clearStoredToken();
-  // Trigger reauth in the store (non-hook access)
-  useWalletStore.getState().triggerReauth();
+  // Clear session in the store (non-hook access) - this will logout the user
+  useWalletStore.getState().clearAddress();
 }
 
 // Check response for 401 and handle it
 async function checkAuthError(response: Response): Promise<void> {
   if (response.status === 401) {
     handle401Error();
-    throw new Error('Session expired. Please sign in again.');
+    throw new Error('Session expired. Please reconnect your wallet.');
   }
 }
 

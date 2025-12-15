@@ -1,3 +1,5 @@
+import { useWalletStore } from '@/lib/store/useWalletStore';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_HOOPX_API_URL || 'https://a03low.hoopx.gg';
 
 interface ApiResponse<T> {
@@ -5,6 +7,27 @@ interface ApiResponse<T> {
   msg: string;
   data: T;
   timestamp: number;
+}
+
+// Helper to clear token from localStorage when 401 occurs
+function clearStoredToken(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('hoopx_session_token');
+}
+
+// Handle 401 response - clear token and logout user
+function handle401Error(): void {
+  console.log('401 Unauthorized - logging out user');
+  clearStoredToken();
+  useWalletStore.getState().clearAddress();
+}
+
+// Check response for 401 and handle it
+function checkAuthError(response: Response): void {
+  if (response.status === 401) {
+    handle401Error();
+    throw new Error('Session expired. Please reconnect your wallet.');
+  }
 }
 
 // Types
@@ -28,6 +51,8 @@ export async function getLuckyStats(): Promise<LuckyWinStats> {
       ...(token && { Authorization: `Bearer ${token}` }),
     },
   });
+
+  checkAuthError(response);
 
   if (!response.ok) {
     throw new Error(`Failed to get lucky stats: ${response.status}`);
