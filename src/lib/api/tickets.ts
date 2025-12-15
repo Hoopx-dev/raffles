@@ -1,4 +1,5 @@
-import { useWalletStore } from '@/lib/store/useWalletStore';
+import { useWalletStore, callGlobalDisconnect } from '@/lib/store/useWalletStore';
+import { queryClient } from '@/components/providers';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_HOOPX_API_URL || 'https://a03low.hoopx.gg';
 
@@ -9,18 +10,35 @@ interface ApiResponse<T> {
   timestamp: number;
 }
 
+// Flag to prevent multiple logout attempts
+let isLoggingOut = false;
+
 // Helper to clear token from localStorage when 401 occurs
 function clearStoredToken(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem('hoopx_session_token');
 }
 
-// Handle 401 response - clear token and logout user
+// Handle 401 response - clear token and logout user completely
 function handle401Error(): void {
-  console.log('401 Unauthorized - logging out user');
+  // Prevent multiple simultaneous logout attempts
+  if (isLoggingOut) return;
+  isLoggingOut = true;
+
+  console.log('401 Unauthorized - disconnecting wallet and logging out');
+  // Clear localStorage token
   clearStoredToken();
-  // Clear session in the store (non-hook access) - this will logout the user
+  // Clear React Query cache to stop any retries
+  queryClient.clear();
+  // Clear wallet store state (this will logout the user)
   useWalletStore.getState().clearAddress();
+  // Disconnect the wallet adapter to prevent auto-reconnect login
+  callGlobalDisconnect();
+
+  // Reset flag after a short delay
+  setTimeout(() => {
+    isLoggingOut = false;
+  }, 1000);
 }
 
 // Check response for 401 and handle it

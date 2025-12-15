@@ -1,20 +1,30 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Global disconnect function that can be set by useAuth and called from API handlers
+let globalDisconnect: (() => void) | null = null;
+
+export function setGlobalDisconnect(fn: () => void) {
+  globalDisconnect = fn;
+}
+
+export function callGlobalDisconnect() {
+  if (globalDisconnect) {
+    globalDisconnect();
+  }
+}
+
 interface WalletState {
   address: string | null;
   truncatedAddress: string | null;
   hoopxBalance: number;
   sessionToken: string | null;
   isAuthenticated: boolean;
-  needsReauth: boolean;
   setAddress: (address: string | null) => void;
   setHoopxBalance: (balance: number) => void;
   setSession: (token: string) => void;
   clearSession: () => void;
   clearAddress: () => void;
-  triggerReauth: () => void;
-  clearReauthFlag: () => void;
 }
 
 /**
@@ -33,7 +43,6 @@ export const useWalletStore = create<WalletState>()(
       hoopxBalance: 0,
       sessionToken: null,
       isAuthenticated: false,
-      needsReauth: false,
 
       setAddress: (address) => set({
         address,
@@ -47,7 +56,6 @@ export const useWalletStore = create<WalletState>()(
       setSession: (token) => set({
         sessionToken: token,
         isAuthenticated: true,
-        needsReauth: false,
       }),
 
       clearSession: () => set({
@@ -61,17 +69,6 @@ export const useWalletStore = create<WalletState>()(
         hoopxBalance: 0,
         sessionToken: null,
         isAuthenticated: false,
-        needsReauth: false,
-      }),
-
-      triggerReauth: () => set({
-        sessionToken: null,
-        isAuthenticated: false,
-        needsReauth: true,
-      }),
-
-      clearReauthFlag: () => set({
-        needsReauth: false,
       }),
     }),
     {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletStore } from '@/lib/store/useWalletStore';
+import { useWalletStore, setGlobalDisconnect } from '@/lib/store/useWalletStore';
 import { getNonce, siwsLogin, createSiwsMessage } from '@/lib/api/auth';
 import { queryClient } from '@/components/providers';
 import bs58 from 'bs58';
@@ -29,8 +29,13 @@ let globalLoginLock = false;
 
 export function useAuth() {
   const { publicKey, signMessage, connected, disconnect } = useWallet();
-  const { setAddress, setSession, clearAddress, clearSession, sessionToken, isAuthenticated, needsReauth, clearReauthFlag } = useWalletStore();
+  const { setAddress, setSession, clearAddress, clearSession, sessionToken, isAuthenticated } = useWalletStore();
   const loginAttempted = useRef(false);
+
+  // Register global disconnect function for API 401 handlers
+  useEffect(() => {
+    setGlobalDisconnect(disconnect);
+  }, [disconnect]);
 
   // On mount, restore session from localStorage
   useEffect(() => {
@@ -137,16 +142,6 @@ export function useAuth() {
       }
     }
   }, [connected, publicKey, setAddress, setSession, performSiwsLogin]);
-
-  // Handle reauth trigger (e.g., after 401 error)
-  useEffect(() => {
-    if (needsReauth && connected && publicKey && signMessage && !globalLoginLock) {
-      console.log('Reauth triggered, clearing flag and initiating login...');
-      clearReauthFlag();
-      loginAttempted.current = false; // Reset to allow new login attempt
-      performSiwsLogin();
-    }
-  }, [needsReauth, connected, publicKey, signMessage, clearReauthFlag, performSiwsLogin]);
 
   return {
     isAuthenticated,
