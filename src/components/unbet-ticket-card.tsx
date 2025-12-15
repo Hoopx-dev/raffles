@@ -29,6 +29,13 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
     return !isNaN(num) && num >= 0 && num <= 1000;
   };
 
+  const handleScoreChange = (value: string): string => {
+    const numericOnly = value.replace(/[^0-9]/g, '');
+    if (!numericOnly) return '';
+    const num = parseInt(numericOnly, 10);
+    return num > 1000 ? '1000' : numericOnly;
+  };
+
   const handleSubmit = () => {
     const newErrors: { home?: string; away?: string } = {};
 
@@ -98,7 +105,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
                 label={t.tickets.homeScore}
                 placeholder="0-1000"
                 value={homeScore}
-                onChange={(e) => setHomeScore(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => setHomeScore(handleScoreChange(e.target.value))}
                 error={errors.home}
               />
             </div>
@@ -111,7 +118,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
                 label={t.tickets.awayScore}
                 placeholder="0-1000"
                 value={awayScore}
-                onChange={(e) => setAwayScore(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => setAwayScore(handleScoreChange(e.target.value))}
                 error={errors.away}
               />
             </div>
