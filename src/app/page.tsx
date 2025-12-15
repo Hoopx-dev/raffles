@@ -17,20 +17,17 @@ import { Toast } from "@/components/ui/toast";
 import { WonCard } from "@/components/won-card";
 import { WonModal, useWonModal } from "@/components/won-modal";
 import { useTabStore } from "@/lib/store/useTabStore";
+import { useUIStore } from "@/lib/store/useUIStore";
 import { useHomeData, getNextTier, getCurrentPrizePool, useEventStatus } from "@/lib/hooks/useHomeData";
 import { useTicketList } from "@/lib/hooks/useTickets";
-import { useState } from "react";
 
 export default function Home() {
   const { mainTab } = useTabStore();
+  const { toast, showToast, hideToast } = useUIStore();
   const { data: homeData, isLoading: isHomeLoading } = useHomeData();
   const { isEventEnded } = useEventStatus();
   const { isOpen: isWonModalOpen, closeModal: closeWonModal } = useWonModal();
   const { data: ticketData } = useTicketList('PLACED');
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error" | "info";
-  } | null>(null);
 
   // Get event info from API
   const eventInfo = homeData?.eventInfo;
@@ -56,10 +53,7 @@ export default function Home() {
   const showWonCard = isEventEnded && hasWinningTickets;
 
   const handleRedeemSuccess = () => {
-    setToast({
-      message: "You've redeemed tickets successfully!",
-      type: "success",
-    });
+    showToast("You've redeemed tickets successfully!", "success");
   };
 
   return (
@@ -128,7 +122,7 @@ export default function Home() {
         <Toast
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast(null)}
+          onClose={hideToast}
         />
       )}
     </main>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useUIStore } from '@/lib/store/useUIStore';
+import { useTabStore } from '@/lib/store/useTabStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useEventStatus } from '@/lib/hooks/useHomeData';
 import { usePlaceTicket, UserTicket } from '@/lib/hooks/useTickets';
@@ -22,6 +23,8 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
   const { isEventEnded } = useEventStatus();
 
   const openLuckyNumberModal = useUIStore((s) => s.openLuckyNumberModal);
+  const showToast = useUIStore((s) => s.showToast);
+  const setTicketSubTab = useTabStore((s) => s.setTicketSubTab);
   const { mutate: placeTicket, isPending: isSubmitting } = usePlaceTicket();
 
   const validateScore = (value: string): boolean => {
@@ -68,6 +71,8 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
       {
         onSuccess: (result) => {
           console.log('Place ticket result:', result);
+          showToast('Prediction placed successfully!', 'success');
+          setTicketSubTab('bet');
           // Show lucky number modal if hit lucky egg
           if (result.eggReward?.success && result.eggReward.luckyNumbers.length > 0) {
             openLuckyNumberModal(result.eggReward.luckyNumbers);

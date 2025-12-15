@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 
+interface ToastState {
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
 interface UIState {
   isInfoModalOpen: boolean;
   isRedeemModalOpen: boolean;
@@ -7,6 +12,7 @@ interface UIState {
   isLuckyNumberModalOpen: boolean;
   luckyNumbers: number[];
   pendingRedeemAmount: number;
+  toast: ToastState | null;
   openInfoModal: () => void;
   closeInfoModal: () => void;
   openRedeemModal: () => void;
@@ -16,6 +22,8 @@ interface UIState {
   openLuckyNumberModal: (numbers: number[]) => void;
   closeLuckyNumberModal: () => void;
   closeAllModals: () => void;
+  showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+  hideToast: () => void;
 }
 
 export const useUIStore = create<UIState>()((set) => ({
@@ -25,6 +33,7 @@ export const useUIStore = create<UIState>()((set) => ({
   isLuckyNumberModalOpen: false,
   luckyNumbers: [],
   pendingRedeemAmount: 1,
+  toast: null,
 
   openInfoModal: () => set({ isInfoModalOpen: true }),
   closeInfoModal: () => set({ isInfoModalOpen: false }),
@@ -53,4 +62,7 @@ export const useUIStore = create<UIState>()((set) => ({
       isConfirmModalOpen: false,
       isLuckyNumberModalOpen: false,
     }),
+
+  showToast: (message, type = 'success') => set({ toast: { message, type } }),
+  hideToast: () => set({ toast: null }),
 }));
