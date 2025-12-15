@@ -22,7 +22,8 @@ function convertGameInfo(game: GameInfo): ProcessedGame {
   };
 
   const gameDate = new Date(game.gameTime);
-  const dateKey = gameDate.toISOString().split('T')[0];
+  // Use HKT for date grouping (same as Beijing time from API)
+  const dateKey = gameDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Hong_Kong' });
   const date = gameDate.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
