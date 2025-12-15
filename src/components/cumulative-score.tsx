@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/i18n/useTranslation";
-import { useEventStatus } from "@/lib/hooks/useHomeData";
 import { formatNumber } from "@/lib/utils";
 
 interface CumulativeScoreProps {
@@ -14,7 +13,6 @@ export function CumulativeScore({
   awayTeams,
 }: CumulativeScoreProps) {
   const { t } = useTranslation();
-  const { isEventEnded } = useEventStatus();
 
   return (
     <div className='mx-4 mb-4'>
@@ -39,19 +37,8 @@ export function CumulativeScore({
             </p>
           </div>
 
-          {/* Status & Divider */}
-          <div className='flex flex-col items-center'>
-            <span
-              className={`text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
-                isEventEnded
-                  ? "bg-red-500/30 text-red-400"
-                  : "bg-green-500/30 text-green-400"
-              }`}
-            >
-              {isEventEnded ? "Final" : "Ongoing"}
-            </span>
-            <div className='text-3xl font-bold text-white/60 mt-1'>:</div>
-          </div>
+          {/* Divider */}
+          <div className='text-3xl font-bold text-white/60'>:</div>
 
           {/* Away Teams */}
           <div className='text-center flex-1'>

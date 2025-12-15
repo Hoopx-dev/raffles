@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@/i18n/useTranslation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useHomeData } from "@/lib/hooks/useHomeData";
+import { useEventStatus, useHomeData } from "@/lib/hooks/useHomeData";
 import { useWalletStore } from "@/lib/store/useWalletStore";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
@@ -42,10 +42,13 @@ export function Header() {
   const { truncatedAddress } = useWalletStore();
   const { logout } = useAuth();
   const { data: homeData } = useHomeData();
+  const { isEventEnded } = useEventStatus();
   const queryClient = useQueryClient();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(
+    null
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -101,7 +104,7 @@ export function Header() {
   return (
     <header className='relative'>
       {/* Content */}
-      <div className='relative z-10 px-4 pt-2 pb-6'>
+      <div className='relative z-10 px-4 pt-2 pb-2'>
         {/* Top bar: Wallet */}
         <div className='flex justify-end items-center gap-2 -mb-2'>
           {/* Wallet Button - only show when connected */}
@@ -111,8 +114,18 @@ export function Header() {
                 onClick={handleWalletClick}
                 className='flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-white/20 text-white hover:bg-white/30'
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
+                  />
                 </svg>
                 {truncatedAddress}
               </button>
@@ -146,6 +159,19 @@ export function Header() {
             {t.header.subtitle}
           </p>
 
+          {/* Event Status Badge */}
+          <div className='mt-1'>
+            <span
+              className={`text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${
+                isEventEnded
+                  ? "bg-red-500/30 text-red-300"
+                  : "bg-green-500/30 text-green-300"
+              }`}
+            >
+              {isEventEnded ? "Event Ended" : "Ongoing"}
+            </span>
+          </div>
+
           {/* Countdown Timer */}
           {timeRemaining && !timeRemaining.isExpired && (
             <div className='mt-2 flex items-center gap-2'>
@@ -178,11 +204,6 @@ export function Header() {
                   <p className='text-white/60 text-[10px] uppercase'>Sec</p>
                 </div>
               </div>
-            </div>
-          )}
-          {timeRemaining?.isExpired && (
-            <div className='mt-4 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2'>
-              <span className='text-gold font-bold'>Event Ended</span>
             </div>
           )}
         </div>
