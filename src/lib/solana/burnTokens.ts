@@ -8,7 +8,9 @@ import {
   createTransferInstruction,
   getAssociatedTokenAddress,
   getAccount,
+  createAssociatedTokenAccountInstruction,
   TOKEN_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 
 // HOOPX token mint address (replace with actual mint address)
@@ -61,6 +63,26 @@ export async function burnHoopxTokens({
     const HOOPX_DECIMALS = 6;
     const amountInSmallestUnit = BigInt(amount * Math.pow(10, HOOPX_DECIMALS));
 
+    // Create transaction
+    const transaction = new Transaction();
+
+    // Check if burn token account exists, create if needed
+    try {
+      await getAccount(connection, burnTokenAccount);
+    } catch {
+      // Account doesn't exist, add instruction to create it
+      console.log('Burn token account does not exist, creating ATA...');
+      const createAtaInstruction = createAssociatedTokenAccountInstruction(
+        walletPublicKey, // payer
+        burnTokenAccount, // ata address
+        burnPublicKey, // owner
+        HOOPX_MINT, // mint
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID
+      );
+      transaction.add(createAtaInstruction);
+    }
+
     // Create transfer instruction
     const transferInstruction = createTransferInstruction(
       senderTokenAccount,
@@ -71,8 +93,7 @@ export async function burnHoopxTokens({
       TOKEN_PROGRAM_ID
     );
 
-    // Create transaction
-    const transaction = new Transaction().add(transferInstruction);
+    transaction.add(transferInstruction);
 
     // Get recent blockhash
     const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
