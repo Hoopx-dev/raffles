@@ -1,17 +1,20 @@
 'use client';
 
 import { useTabStore } from '@/lib/store/useTabStore';
+import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTicketCounts } from '@/lib/hooks/useTickets';
 import { Tabs } from './ui/tabs';
 import { useTranslation } from '@/i18n/useTranslation';
 
 export function TabNavigation() {
   const { mainTab, setMainTab } = useTabStore();
+  const { isAuthenticated } = useWalletStore();
   const { data: counts } = useTicketCounts();
   const { t } = useTranslation();
 
   // Total tickets = unused + placed (exclude expired from count display)
-  const ticketCount = (counts?.unusedCount || 0) + (counts?.placedCount || 0);
+  // Only show count when authenticated
+  const ticketCount = isAuthenticated ? (counts?.unusedCount || 0) + (counts?.placedCount || 0) : 0;
 
   return (
     <div className="px-4 pt-3 relative z-10">
