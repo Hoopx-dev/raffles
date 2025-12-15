@@ -74,6 +74,7 @@ export const useWalletStore = create<WalletState>()(
     {
       name: 'hoopx-wallet-storage',
       partialize: (state) => ({
+        address: state.address,
         sessionToken: state.sessionToken,
         isAuthenticated: state.isAuthenticated,
       }),

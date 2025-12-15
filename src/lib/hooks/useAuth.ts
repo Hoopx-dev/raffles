@@ -121,16 +121,31 @@ export function useAuth() {
     disconnect();
   }, [clearAddress, clearSession, disconnect]);
 
-  // Handle wallet connection changes
+  // Handle wallet connection changes and detect wallet switches
   useEffect(() => {
     if (connected && publicKey) {
       const walletAddress = publicKey.toBase58();
+      const storedAddress = useWalletStore.getState().address;
+
+      // Detect wallet address change - if we have a stored address that's different
+      // from the current wallet, clear the session first (auto-logout)
+      if (storedAddress && storedAddress !== walletAddress) {
+        console.log('Wallet address changed from', storedAddress, 'to', walletAddress);
+        console.log('Auto-logging out due to wallet change');
+        clearStoredToken();
+        clearSession();
+        queryClient.clear();
+        globalLoginLock = false;
+      }
+
+      // Update the address
       setAddress(walletAddress);
 
-      // Check if already authenticated or token exists
+      // Check if already authenticated or token exists for the current wallet
       const existingToken = getStoredToken();
-      if (existingToken) {
-        console.log('Session token exists, restoring session');
+      // Only restore session if the stored address matches current wallet
+      if (existingToken && (!storedAddress || storedAddress === walletAddress)) {
+        console.log('Session token exists for current wallet, restoring session');
         setSession(existingToken);
       } else if (!globalLoginLock) {
         // No token and not already logging in - trigger login
@@ -138,7 +153,7 @@ export function useAuth() {
         performSiwsLogin();
       }
     }
-  }, [connected, publicKey, setAddress, setSession, performSiwsLogin]);
+  }, [connected, publicKey, setAddress, setSession, clearSession, performSiwsLogin]);
 
   return {
     isAuthenticated,
