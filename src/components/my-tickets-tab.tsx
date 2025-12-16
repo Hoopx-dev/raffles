@@ -167,24 +167,26 @@ export function MyTicketsTab() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-6">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-          >
-            Prev
-          </button>
+        <div className="flex items-center justify-between mt-6">
           <span className="text-white/70">
-            {currentPage} / {totalPages}
+            {Math.min(currentPage * TICKETS_PER_PAGE, tickets.length)}/{tickets.length}
           </span>
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-          >
-            Next
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Prev
+            </button>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 
