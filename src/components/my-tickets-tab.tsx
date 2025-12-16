@@ -6,7 +6,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTabStore } from '@/lib/store/useTabStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
-import { useHomeData } from '@/lib/hooks/useHomeData';
+import { useHomeData, useEventStatus } from '@/lib/hooks/useHomeData';
 import { useTicketList, useTicketCounts } from '@/lib/hooks/useTickets';
 import { isMobileDevice } from '@/lib/utils/mobile-deeplink';
 import MobileWalletModal from './mobile-wallet-modal';
@@ -28,6 +28,7 @@ export function MyTicketsTab() {
   // Get event ID from home data
   const { data: homeData } = useHomeData();
   const eventId = homeData?.eventInfo?.id;
+  const { isBettingClosed, isEventEnded } = useEventStatus();
 
   // Fetch counts first to determine which tabs to show
   const { data: counts, isLoading: countsLoading } = useTicketCounts();
@@ -151,6 +152,15 @@ export function MyTicketsTab() {
             activeTab={ticketSubTab}
             onTabChange={(tab) => handleTabChange(tab as 'unbet' | 'bet')}
           />
+        </div>
+      )}
+
+      {/* Betting closed warning */}
+      {!isEventEnded && !isBettingClosed && (
+        <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3 mb-4">
+          <p className="text-yellow-200 text-sm text-center">
+            ⏰ Please submit your predictions before the countdown ends. You cannot place bets after it expires.
+          </p>
         </div>
       )}
 

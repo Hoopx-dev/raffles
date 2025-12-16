@@ -83,12 +83,21 @@ export function getNextTier(
 
 /**
  * Check if event is active (status 1)
+ * Returns:
+ * - isEventActive: event status is 1
+ * - isBettingClosed: countdown expired but event not ended (betting window closed)
+ * - isEventEnded: event status is 2
  */
 export function useEventStatus() {
   const { data } = useHomeData();
   const isEventActive = data?.eventInfo?.status === 1;
   const isEventEnded = data?.eventInfo?.status === 2;
-  return { isEventActive, isEventEnded };
+
+  // Check if betting is closed (countdown expired)
+  const endTime = data?.eventInfo?.endTime;
+  const isBettingClosed = endTime ? new Date(endTime).getTime() <= Date.now() : false;
+
+  return { isEventActive, isBettingClosed, isEventEnded };
 }
 
 // Re-export types

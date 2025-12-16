@@ -42,7 +42,7 @@ export function Header() {
   const { truncatedAddress } = useWalletStore();
   const { logout } = useAuth();
   const { data: homeData } = useHomeData();
-  const { isEventEnded } = useEventStatus();
+  const { isBettingClosed, isEventEnded } = useEventStatus();
   const queryClient = useQueryClient();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -165,10 +165,12 @@ export function Header() {
               className={`text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full ${
                 isEventEnded
                   ? "bg-red-500/30 text-red-300"
+                  : isBettingClosed
+                  ? "bg-yellow-500/30 text-yellow-300"
                   : "bg-green-500/30 text-green-300"
               }`}
             >
-              {isEventEnded ? "Event Ended" : "Ongoing"}
+              {isEventEnded ? "Event Ended" : isBettingClosed ? "Betting Closed" : "Ongoing"}
             </span>
           </div>
 

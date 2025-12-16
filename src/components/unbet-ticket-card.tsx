@@ -20,7 +20,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
   const [awayScore, setAwayScore] = useState('');
   const [errors, setErrors] = useState<{ home?: string; away?: string }>({});
   const { t } = useTranslation();
-  const { isEventEnded } = useEventStatus();
+  const { isBettingClosed, isEventEnded } = useEventStatus();
 
   const openLuckyNumberModal = useUIStore((s) => s.openLuckyNumberModal);
   const showToast = useUIStore((s) => s.showToast);
@@ -94,10 +94,10 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
         <Badge variant="unbet">{t.tabs.unbet}</Badge>
       </div>
 
-      {/* Score Inputs - hide when event ended */}
-      {isEventEnded ? (
+      {/* Score Inputs - hide when betting closed or event ended */}
+      {(isBettingClosed || isEventEnded) ? (
         <div className="text-center py-4 text-text-muted text-sm">
-          Event has ended. Betting is closed.
+          Betting is closed.
         </div>
       ) : (
         <>
