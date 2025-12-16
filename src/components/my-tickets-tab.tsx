@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTabStore } from '@/lib/store/useTabStore';
@@ -14,11 +14,14 @@ import { SubTabs } from './ui/tabs';
 import { UnbetTicketCard } from './unbet-ticket-card';
 import { BetTicketCard } from './bet-ticket-card';
 
+const TICKETS_PER_PAGE = 10;
+
 export function MyTicketsTab() {
   const { connected } = useWallet();
   const { setVisible } = useWalletModal();
   const { ticketSubTab, setTicketSubTab } = useTabStore();
   const [showMobileModal, setShowMobileModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const openRedeemModal = useUIStore((s) => s.openRedeemModal);
   const { t } = useTranslation();
 
@@ -50,6 +53,19 @@ export function MyTicketsTab() {
   const tickets = (ticketData?.records || []).filter(
     (t) => t.status === 'UNUSED' || t.status === 'PLACED' || t.status === 'EXPIRED'
   );
+
+  // Pagination
+  const totalPages = Math.ceil(tickets.length / TICKETS_PER_PAGE);
+  const paginatedTickets = useMemo(() => {
+    const startIndex = (currentPage - 1) * TICKETS_PER_PAGE;
+    return tickets.slice(startIndex, startIndex + TICKETS_PER_PAGE);
+  }, [tickets, currentPage]);
+
+  // Reset to page 1 when tab changes
+  const handleTabChange = (tab: 'unbet' | 'bet') => {
+    setTicketSubTab(tab);
+    setCurrentPage(1);
+  };
 
   const handleConnect = () => {
     if (isMobileDevice()) {
@@ -133,14 +149,14 @@ export function MyTicketsTab() {
               { id: 'bet', label: `${t.tabs.bet} (${counts?.placedCount || 0})` },
             ]}
             activeTab={ticketSubTab}
-            onTabChange={(tab) => setTicketSubTab(tab as 'unbet' | 'bet')}
+            onTabChange={(tab) => handleTabChange(tab as 'unbet' | 'bet')}
           />
         </div>
       )}
 
       {/* Ticket List */}
       <div className="space-y-4">
-        {tickets.map((ticket) =>
+        {paginatedTickets.map((ticket) =>
           ticket.status === 'UNUSED' ? (
             <UnbetTicketCard key={ticket.id} ticket={ticket} eventId={eventId} />
           ) : (
@@ -148,6 +164,29 @@ export function MyTicketsTab() {
           )
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          >
+            Prev
+          </button>
+          <span className="text-white/70">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Redeem More Button */}
       <button
