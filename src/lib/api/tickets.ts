@@ -57,18 +57,21 @@ export interface LuckyEggRewardRaw {
   success: boolean;
   hitCount: number;
   luckyNumbers: string | number[]; // API may return as JSON string "[1,2]" or actual array
+  luckyAmount: string | string[]; // API may return as JSON string or array of strings like ["100"]
 }
 
 export interface LuckyEggReward {
   success: boolean;
   hitCount: number;
   luckyNumbers: number[];
+  luckyAmount: number[]; // Parsed lucky amounts as numbers
 }
 
 function parseLuckyEggReward(raw: LuckyEggRewardRaw | null): LuckyEggReward | null {
   if (!raw) return null;
 
   let luckyNumbers: number[] = [];
+  let luckyAmount: number[] = [];
 
   if (raw.luckyNumbers) {
     // If it's already an array, use it directly
@@ -86,10 +89,28 @@ function parseLuckyEggReward(raw: LuckyEggRewardRaw | null): LuckyEggReward | nu
     }
   }
 
+  if (raw.luckyAmount) {
+    // If it's already an array, convert strings to numbers
+    if (Array.isArray(raw.luckyAmount)) {
+      luckyAmount = raw.luckyAmount.map((amt) => Number(amt));
+    } else if (typeof raw.luckyAmount === 'string') {
+      // If it's a string, try to parse it
+      try {
+        const parsed = JSON.parse(raw.luckyAmount);
+        luckyAmount = Array.isArray(parsed) ? parsed.map(Number) : [Number(parsed)];
+      } catch {
+        // If parsing fails, try to extract numbers
+        const matches = raw.luckyAmount.match(/\d+/g);
+        luckyAmount = matches ? matches.map(Number) : [];
+      }
+    }
+  }
+
   return {
     success: raw.success,
     hitCount: raw.hitCount,
     luckyNumbers,
+    luckyAmount,
   };
 }
 

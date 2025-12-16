@@ -33,6 +33,7 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
 
   const isLucky = !!placement?.luckyStatus;
   const luckyNumbers = placement?.eggReward?.luckyNumbers || [];
+  const luckyAmount = placement?.eggReward?.luckyAmount || [];
 
   // Check which score is the lucky number
   const isHomeLucky = isLucky && luckyNumbers.includes(placement?.predictHomeScore ?? -1);
@@ -40,8 +41,11 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
 
   const handleCardClick = () => {
     if (isLucky && placement) {
-      // Show the lucky number modal with the actual lucky numbers from eggReward
-      openLuckyNumberModal(luckyNumbers.length > 0 ? luckyNumbers : [placement.predictHomeScore]);
+      // Show the lucky number modal with the actual lucky numbers and amounts from eggReward
+      openLuckyNumberModal(
+        luckyNumbers.length > 0 ? luckyNumbers : [placement.predictHomeScore],
+        luckyAmount
+      );
     }
   };
 

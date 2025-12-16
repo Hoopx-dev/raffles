@@ -75,7 +75,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
           setTicketSubTab('bet');
           // Show lucky number modal if hit lucky egg
           if (result.eggReward?.success && result.eggReward.luckyNumbers.length > 0) {
-            openLuckyNumberModal(result.eggReward.luckyNumbers);
+            openLuckyNumberModal(result.eggReward.luckyNumbers, result.eggReward.luckyAmount);
           }
         },
         onError: (error) => {

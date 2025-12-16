@@ -11,6 +11,7 @@ interface UIState {
   isConfirmModalOpen: boolean;
   isLuckyNumberModalOpen: boolean;
   luckyNumbers: number[];
+  luckyAmount: number[];
   pendingRedeemAmount: number;
   toast: ToastState | null;
   openInfoModal: () => void;
@@ -19,7 +20,7 @@ interface UIState {
   closeRedeemModal: () => void;
   openConfirmModal: (amount: number) => void;
   closeConfirmModal: () => void;
-  openLuckyNumberModal: (numbers: number[]) => void;
+  openLuckyNumberModal: (numbers: number[], amount?: number[]) => void;
   closeLuckyNumberModal: () => void;
   closeAllModals: () => void;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -32,6 +33,7 @@ export const useUIStore = create<UIState>()((set) => ({
   isConfirmModalOpen: false,
   isLuckyNumberModalOpen: false,
   luckyNumbers: [],
+  luckyAmount: [],
   pendingRedeemAmount: 1,
   toast: null,
 
@@ -50,10 +52,10 @@ export const useUIStore = create<UIState>()((set) => ({
   closeConfirmModal: () =>
     set({ isConfirmModalOpen: false, pendingRedeemAmount: 1 }),
 
-  openLuckyNumberModal: (numbers) =>
-    set({ isLuckyNumberModalOpen: true, luckyNumbers: numbers }),
+  openLuckyNumberModal: (numbers, amount = []) =>
+    set({ isLuckyNumberModalOpen: true, luckyNumbers: numbers, luckyAmount: amount }),
   closeLuckyNumberModal: () =>
-    set({ isLuckyNumberModalOpen: false, luckyNumbers: [] }),
+    set({ isLuckyNumberModalOpen: false, luckyNumbers: [], luckyAmount: [] }),
 
   closeAllModals: () =>
     set({

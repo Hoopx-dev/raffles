@@ -29,9 +29,12 @@ function createConfetti(container: HTMLDivElement) {
 }
 
 export function LuckyNumberModal() {
-  const { isLuckyNumberModalOpen, closeLuckyNumberModal, luckyNumbers } = useUIStore();
+  const { isLuckyNumberModalOpen, closeLuckyNumberModal, luckyNumbers, luckyAmount } = useUIStore();
   const confettiRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
+
+  // Calculate total prize amount from luckyAmount array
+  const totalPrize = luckyAmount.reduce((sum, amt) => sum + amt, 0);
 
   useEffect(() => {
     if (isLuckyNumberModalOpen && confettiRef.current) {
@@ -99,11 +102,11 @@ export function LuckyNumberModal() {
             {t.modals.lucky.youWon}
           </p>
           <p className="text-2xl font-bold text-gold">
-            {luckyNumbers.length * 10} USDT
+            {totalPrize} USDT
           </p>
-          {luckyNumbers.length > 1 && (
+          {luckyNumbers.length > 1 && luckyAmount.length > 1 && (
             <p className="text-text-muted text-xs mt-1">
-              ({luckyNumbers.length} lucky numbers × 10 USDT each)
+              ({luckyNumbers.length} lucky numbers)
             </p>
           )}
         </div>
