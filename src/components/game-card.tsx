@@ -46,7 +46,7 @@ export function GameCard({ game }: GameCardProps) {
       </div>
 
       {/* Teams and Score */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         {/* Home Team */}
         <div className="flex flex-col items-center flex-1">
           <div className="w-16 h-16 relative mb-2">
