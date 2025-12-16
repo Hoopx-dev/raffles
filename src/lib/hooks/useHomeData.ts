@@ -87,9 +87,25 @@ export function getNextTier(
  * - isEventActive: event status is 1
  * - isBettingClosed: countdown expired but event not ended (betting window closed)
  * - isEventEnded: event status is 2
+ *
+ * Preview mode: Add ?preview=betting-closed or ?preview=event-ended to URL
  */
 export function useEventStatus() {
   const { data } = useHomeData();
+
+  // Check for preview mode via URL params
+  const previewMode = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('preview')
+    : null;
+
+  // Preview overrides
+  if (previewMode === 'betting-closed') {
+    return { isEventActive: true, isBettingClosed: true, isEventEnded: false };
+  }
+  if (previewMode === 'event-ended') {
+    return { isEventActive: false, isBettingClosed: true, isEventEnded: true };
+  }
+
   const isEventActive = data?.eventInfo?.status === 1;
   const isEventEnded = data?.eventInfo?.status === 2;
 
