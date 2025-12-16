@@ -129,49 +129,42 @@ export function useAuth() {
     disconnect();
   }, [clearAddress, clearSession, disconnect]);
 
-  // Dedicated effect to detect wallet switches and auto-logout
-  // This runs whenever publicKey changes (including when user switches wallet in Jupiter app)
+  // Handle wallet connection and detect wallet switches
   useEffect(() => {
-    if (!publicKey) return;
+    if (!connected || !publicKey) return;
 
     const currentWalletAddress = publicKey.toBase58();
     const storedWallet = getStoredWallet();
     const storedToken = getStoredToken();
 
-    // If we have a stored wallet AND token, but wallet changed, force logout (no re-login)
-    if (storedWallet && storedToken && storedWallet !== currentWalletAddress) {
+    // Always update zustand address to match current wallet
+    setAddress(currentWalletAddress);
+
+    // Case 1: Valid session exists for current wallet - restore it
+    if (storedToken && storedWallet === currentWalletAddress) {
+      console.log('Session token exists for current wallet, restoring session');
+      setSession(storedToken);
+      return;
+    }
+
+    // Case 2: Session exists but for DIFFERENT wallet - just logout, no re-login
+    if (storedToken && storedWallet && storedWallet !== currentWalletAddress) {
       console.log('🔄 Wallet switched from', storedWallet, 'to', currentWalletAddress);
       console.log('🚪 Auto-logging out due to wallet change...');
-
-      // Clear everything - user must manually login again
       clearStoredSession();
-      clearAddress();
       clearSession();
       queryClient.clear();
       globalLoginLock = false;
+      // Don't trigger login - user must manually login
+      return;
     }
-  }, [publicKey, clearAddress, clearSession]);
 
-  // Handle wallet connection - only restore existing valid sessions
-  useEffect(() => {
-    if (connected && publicKey) {
-      const walletAddress = publicKey.toBase58();
-
-      // Always update zustand address to match current wallet
-      setAddress(walletAddress);
-
-      // Check if token exists AND belongs to the current wallet
-      const existingToken = getStoredToken();
-      const storedWallet = getStoredWallet();
-
-      if (existingToken && storedWallet === walletAddress) {
-        // Token exists and matches current wallet - restore session
-        console.log('Session token exists for current wallet, restoring session');
-        setSession(existingToken);
-      }
-      // No auto-login - user must manually trigger login
+    // Case 3: No existing session - fresh login needed
+    if (!storedToken && !globalLoginLock) {
+      console.log('No session token, triggering SIWS login...');
+      performSiwsLogin();
     }
-  }, [connected, publicKey, setAddress, setSession]);
+  }, [connected, publicKey, setAddress, setSession, clearSession, performSiwsLogin]);
 
   return {
     isAuthenticated,
