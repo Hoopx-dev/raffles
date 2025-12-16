@@ -49,23 +49,23 @@ export function InfoModal() {
         <div>
           <h3 className="font-bold text-text-dark mb-2">{t.modals.info.prizeLadder}</h3>
           <div className="bg-bg-input rounded-xl p-4">
-            <table className="w-full text-sm">
+            <table className="text-sm">
               <tbody className="text-text-muted">
                 <tr>
-                  <td className="py-1">0 - 100 Tickets</td>
-                  <td className="py-1 text-right">2,000 USDT</td>
+                  <td className="py-1 pr-4 whitespace-nowrap">0 - 100 Tickets</td>
+                  <td className="py-1 whitespace-nowrap">Prize Pool: 2,000 USDT</td>
                 </tr>
                 <tr>
-                  <td className="py-1">100 - 1,000 Tickets</td>
-                  <td className="py-1 text-right">20,000 USDT</td>
+                  <td className="py-1 pr-4 whitespace-nowrap">100 - 1,000 Tickets</td>
+                  <td className="py-1 whitespace-nowrap">Prize Pool: 20,000 USDT</td>
                 </tr>
                 <tr>
-                  <td className="py-1">1,000 - 10,000 Tickets</td>
-                  <td className="py-1 text-right">200,000 USDT</td>
+                  <td className="py-1 pr-4 whitespace-nowrap">1,000 - 10,000 Tickets</td>
+                  <td className="py-1 whitespace-nowrap">Prize Pool: 200,000 USDT</td>
                 </tr>
                 <tr>
-                  <td className="py-1">10,000 - 100,000 Tickets</td>
-                  <td className="py-1 text-right">2,000,000 USDT</td>
+                  <td className="py-1 pr-4 whitespace-nowrap">10,000 - 100,000 Tickets</td>
+                  <td className="py-1 whitespace-nowrap">Prize Pool: 2,000,000 USDT</td>
                 </tr>
               </tbody>
             </table>
