@@ -121,39 +121,55 @@ export function useAuth() {
     disconnect();
   }, [clearAddress, clearSession, disconnect]);
 
-  // Handle wallet connection changes and detect wallet switches
+  // Dedicated effect to detect wallet switches and auto-logout
+  // This runs whenever publicKey changes (including when user switches wallet in Jupiter app)
+  useEffect(() => {
+    if (!publicKey) return;
+
+    const currentWalletAddress = publicKey.toBase58();
+    const storedAddress = useWalletStore.getState().address;
+    const storedToken = getStoredToken();
+
+    // If we have a stored address AND token, but wallet changed, force logout
+    if (storedAddress && storedToken && storedAddress !== currentWalletAddress) {
+      console.log('🔄 Wallet switched from', storedAddress, 'to', currentWalletAddress);
+      console.log('🚪 Auto-logging out due to wallet change...');
+
+      // Clear everything
+      clearStoredToken();
+      clearAddress();
+      queryClient.clear();
+      globalLoginLock = false;
+
+      // Update to new address (this will trigger login flow below)
+      setAddress(currentWalletAddress);
+    }
+  }, [publicKey, clearAddress, setAddress]);
+
+  // Handle wallet connection and login flow
   useEffect(() => {
     if (connected && publicKey) {
       const walletAddress = publicKey.toBase58();
       const storedAddress = useWalletStore.getState().address;
 
-      // Detect wallet address change - if we have a stored address that's different
-      // from the current wallet, clear the session first (auto-logout)
-      if (storedAddress && storedAddress !== walletAddress) {
-        console.log('Wallet address changed from', storedAddress, 'to', walletAddress);
-        console.log('Auto-logging out due to wallet change');
-        clearStoredToken();
-        clearSession();
-        queryClient.clear();
-        globalLoginLock = false;
+      // Update the address if not set or different
+      if (storedAddress !== walletAddress) {
+        setAddress(walletAddress);
       }
-
-      // Update the address
-      setAddress(walletAddress);
 
       // Check if already authenticated or token exists for the current wallet
       const existingToken = getStoredToken();
-      // Only restore session if the stored address matches current wallet
-      if (existingToken && (!storedAddress || storedAddress === walletAddress)) {
+      if (existingToken && storedAddress === walletAddress) {
+        // Token exists and matches current wallet
         console.log('Session token exists for current wallet, restoring session');
         setSession(existingToken);
-      } else if (!globalLoginLock) {
+      } else if (!existingToken && !globalLoginLock) {
         // No token and not already logging in - trigger login
         console.log('No session token, triggering SIWS login...');
         performSiwsLogin();
       }
     }
-  }, [connected, publicKey, setAddress, setSession, clearSession, performSiwsLogin]);
+  }, [connected, publicKey, setAddress, setSession, performSiwsLogin]);
 
   return {
     isAuthenticated,
