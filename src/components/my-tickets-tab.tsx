@@ -179,6 +179,9 @@ export function MyTicketsTab() {
             >
               Prev
             </button>
+            <span className="text-white/70 min-w-[3rem] text-center">
+              {currentPage} / {totalPages}
+            </span>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
