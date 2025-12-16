@@ -53,6 +53,7 @@ export function InfoModal() {
               <p className="text-text-muted">{t.modals.info.tier1}</p>
               <p className="text-text-muted">{t.modals.info.tier2}</p>
               <p className="text-text-muted">{t.modals.info.tier3}</p>
+              <p className="text-text-muted">{t.modals.info.tier4}</p>
             </div>
           </div>
         </div>
