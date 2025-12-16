@@ -8,6 +8,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { parseBeijingTime } from "@/lib/utils";
 
 interface TimeRemaining {
   days: number;
@@ -18,7 +19,8 @@ interface TimeRemaining {
 }
 
 function calculateTimeRemaining(endTime: string): TimeRemaining {
-  const end = new Date(endTime).getTime();
+  // Parse Beijing time from API for countdown calculation
+  const end = parseBeijingTime(endTime).getTime();
   const now = Date.now();
   const diff = end - now;
 

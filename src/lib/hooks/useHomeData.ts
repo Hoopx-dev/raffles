@@ -8,6 +8,7 @@ import {
   GameInfo,
   PrizePoolTier,
 } from '@/lib/api/home';
+import { parseBeijingTime } from '@/lib/utils';
 
 /**
  * Hook to fetch home page data
@@ -94,8 +95,9 @@ export function useEventStatus() {
   const isEventEnded = data?.eventInfo?.status === 2;
 
   // Check if betting is closed (countdown expired)
+  // Use parseBeijingTime since API returns Beijing time
   const endTime = data?.eventInfo?.endTime;
-  const isBettingClosed = endTime ? new Date(endTime).getTime() <= Date.now() : false;
+  const isBettingClosed = endTime ? parseBeijingTime(endTime).getTime() <= Date.now() : false;
 
   return { isEventActive, isBettingClosed, isEventEnded };
 }

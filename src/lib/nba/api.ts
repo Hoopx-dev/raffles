@@ -8,6 +8,7 @@ import {
   getTeamLogo,
   GameStatus,
 } from './types';
+import { parseBeijingTime } from '@/lib/utils';
 
 const SPORTSDATA_BASE_URL = 'https://api.sportsdata.io/v3/nba/scores/json';
 
@@ -67,27 +68,25 @@ function formatTimeRemaining(minutes: number | null, seconds: number | null): st
 }
 
 /**
- * Format start time
+ * Format start time in user's local timezone
  */
 function formatStartTime(dateTime: string): string {
-  const date = new Date(dateTime);
+  const date = parseBeijingTime(dateTime);
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'Asia/Hong_Kong',
   });
 }
 
 /**
- * Format date for display
+ * Format date for display in user's local timezone
  */
 function formatDate(dateTime: string): string {
-  const date = new Date(dateTime);
+  const date = parseBeijingTime(dateTime);
   return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    timeZone: 'Asia/Hong_Kong',
   });
 }
 

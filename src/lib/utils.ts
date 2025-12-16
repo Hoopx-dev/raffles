@@ -35,17 +35,57 @@ export function formatTimeAgo(timestamp: number): string {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
+/**
+ * Parse a Beijing time string (UTC+8) to a Date object.
+ * API timestamps are in Beijing time but may not include timezone info.
+ * This function ensures correct parsing regardless of the device timezone.
+ */
+export function parseBeijingTime(dateString: string): Date {
+  // If the string already has timezone info, parse directly
+  if (dateString.includes('+') || dateString.includes('Z')) {
+    return new Date(dateString);
+  }
+
+  // Otherwise, treat it as Beijing time (UTC+8)
+  // Append +08:00 to make it explicit
+  const beijingTimeString = dateString.replace(' ', 'T') + '+08:00';
+  return new Date(beijingTimeString);
+}
+
+/**
+ * Format date in user's local timezone
+ * Input should be a Beijing time string from API
+ */
 export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseBeijingTime(dateString);
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 }
 
+/**
+ * Format time in user's local timezone
+ * Input should be a Beijing time string from API
+ */
 export function formatTime(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseBeijingTime(dateString);
   return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+/**
+ * Format date and time in user's local timezone
+ * Input should be a Beijing time string from API
+ */
+export function formatDateTime(dateString: string): string {
+  const date = parseBeijingTime(dateString);
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
     hour: "numeric",
     minute: "2-digit",
     hour12: true,

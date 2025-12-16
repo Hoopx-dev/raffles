@@ -3,6 +3,7 @@
 import { useHomeData, GameInfo } from '@/lib/hooks/useHomeData';
 import { ProcessedGame, GamesByDate, CumulativeScore, GameStatus, getTeamLogo, NBA_TEAMS } from './types';
 import { groupGamesByDate, calculateCumulativeScore } from './api';
+import { parseBeijingTime } from '@/lib/utils';
 
 interface GamesResponse {
   games: ProcessedGame[];
@@ -21,13 +22,16 @@ function convertGameInfo(game: GameInfo): ProcessedGame {
     FINAL: 'final',
   };
 
-  const gameDate = new Date(game.gameTime);
-  // Use HKT for date grouping (same as Beijing time from API)
-  const dateKey = gameDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Hong_Kong' });
+  // Parse Beijing time from API
+  const gameDate = parseBeijingTime(game.gameTime);
+
+  // Use Beijing time for date key grouping (consistent with API)
+  const dateKey = gameDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });
+
+  // Display date and time in user's local timezone
   const date = gameDate.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    timeZone: 'Asia/Hong_Kong',
   });
 
   // Extract team keys from team names (e.g., "Lakers" -> "LAL")
@@ -65,7 +69,6 @@ function convertGameInfo(game: GameInfo): ProcessedGame {
           hour: 'numeric',
           minute: '2-digit',
           hour12: true,
-          timeZone: 'Asia/Hong_Kong',
         })
       : undefined,
     date,
