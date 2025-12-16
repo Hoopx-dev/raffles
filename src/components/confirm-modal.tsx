@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useRedeemTicketsPre, useRedeemTickets } from '@/lib/hooks/useTickets';
+import { useEventStatus } from '@/lib/hooks/useHomeData';
 import { burnHoopxTokens } from '@/lib/solana/burnTokens';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
@@ -39,9 +40,18 @@ export function ConfirmModal({
   const { publicKey, signTransaction } = useWallet();
   const { mutateAsync: createPreOrder } = useRedeemTicketsPre();
   const { mutate: redeemTickets } = useRedeemTickets();
+  const { isEventEnded } = useEventStatus();
 
   const totalCost = pendingRedeemAmount * ticketPrice;
   const isProcessing = step === 'burning' || step === 'redeeming';
+
+  // Check if error is non-recoverable (ordering closed, etc.)
+  const isNonRecoverableError = error?.toLowerCase().includes('closed') ||
+    error?.toLowerCase().includes('ended') ||
+    error?.toLowerCase().includes('last game');
+
+  // Disable if event ended or non-recoverable error
+  const isDisabled = isProcessing || isNonRecoverableError || isEventEnded;
 
   const handleConfirm = async () => {
     if (!address || !publicKey || !signTransaction) {
@@ -179,10 +189,10 @@ export function ConfirmModal({
           </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
+        {/* Error/Warning Message */}
+        {(error || isEventEnded) && (
           <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg">
-            {error}
+            {error || 'The last game of the event has started; ordering channel is closed'}
           </div>
         )}
 
@@ -193,7 +203,7 @@ export function ConfirmModal({
           size="lg"
           onClick={handleConfirm}
           isLoading={isProcessing}
-          disabled={isProcessing}
+          disabled={isDisabled}
         >
           {getButtonText()}
         </Button>
