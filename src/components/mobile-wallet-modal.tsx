@@ -58,8 +58,9 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
         return;
       }
 
-      // Standard WalletConnect flow
+      // Select wallet - AutoConnectOnSelect component will trigger connect()
       select(walletName as import('@solana/wallet-adapter-base').WalletName);
+      onClose();
     } catch (error) {
       console.error('Failed to select wallet:', error);
     }

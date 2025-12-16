@@ -10,11 +10,34 @@ import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { clusterApiUrl } from "@solana/web3.js";
-import { FC, ReactNode, useMemo } from "react";
+import { FC, ReactNode, useEffect, useMemo } from "react";
 
 // Import wallet adapter CSS
 import "@solana/wallet-adapter-react-ui/styles.css";
+
+/**
+ * Auto-connect component that triggers connect() when a wallet is selected
+ * This is needed when autoConnect={false} to handle the standard wallet modal
+ */
+const AutoConnectOnSelect: FC<{ children: ReactNode }> = ({ children }) => {
+  const { wallet, connected, connecting, connect } = useWallet();
+
+  useEffect(() => {
+    // When wallet is selected but not connected/connecting, trigger connect
+    if (wallet && !connected && !connecting) {
+      connect().catch((error) => {
+        // Ignore user rejection errors
+        if (error?.name !== "WalletConnectionError") {
+          console.error("Auto-connect failed:", error);
+        }
+      });
+    }
+  }, [wallet, connected, connecting, connect]);
+
+  return <>{children}</>;
+};
 
 interface WalletContextProviderProps {
   children: ReactNode;
@@ -97,7 +120,9 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect={false}>
-        <WalletModalProvider>{children}</WalletModalProvider>
+        <WalletModalProvider>
+          <AutoConnectOnSelect>{children}</AutoConnectOnSelect>
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   );
