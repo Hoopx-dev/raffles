@@ -175,7 +175,7 @@ export function MyTicketsTab() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed enabled:cursor-pointer"
             >
               Prev
             </button>
@@ -185,7 +185,7 @@ export function MyTicketsTab() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-white/10 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed enabled:cursor-pointer"
             >
               Next
             </button>
