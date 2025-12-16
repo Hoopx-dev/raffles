@@ -8,20 +8,28 @@ import { queryClient } from '@/components/providers';
 import bs58 from 'bs58';
 
 const SESSION_TOKEN_KEY = 'hoopx_session_token';
+const SESSION_WALLET_KEY = 'hoopx_session_wallet';
 
 function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(SESSION_TOKEN_KEY);
 }
 
-function setStoredToken(token: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(SESSION_TOKEN_KEY, token);
+function getStoredWallet(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(SESSION_WALLET_KEY);
 }
 
-function clearStoredToken(): void {
+function setStoredSession(token: string, wallet: string): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(SESSION_TOKEN_KEY, token);
+  localStorage.setItem(SESSION_WALLET_KEY, wallet);
+}
+
+function clearStoredSession(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(SESSION_TOKEN_KEY);
+  localStorage.removeItem(SESSION_WALLET_KEY);
 }
 
 // Global lock to prevent any concurrent login attempts across re-renders
@@ -93,13 +101,13 @@ export function useAuth() {
       });
 
       // Step 5: Store session in localStorage and state
-      setStoredToken(token);
+      setStoredSession(token, walletAddress);
       setSession(token);
 
       console.log('SIWS login successful, token stored');
     } catch (error) {
       console.error('SIWS login failed:', error);
-      clearStoredToken();
+      clearStoredSession();
       clearSession();
     } finally {
       globalLoginLock = false;
@@ -108,8 +116,8 @@ export function useAuth() {
 
   const logout = useCallback(() => {
     console.log('Logging out - clearing all session data');
-    // Clear localStorage token
-    clearStoredToken();
+    // Clear localStorage session (token + wallet)
+    clearStoredSession();
     // Clear zustand store state
     clearAddress();
     clearSession();
@@ -127,45 +135,45 @@ export function useAuth() {
     if (!publicKey) return;
 
     const currentWalletAddress = publicKey.toBase58();
-    const storedAddress = useWalletStore.getState().address;
+    const storedWallet = getStoredWallet();
     const storedToken = getStoredToken();
 
-    // If we have a stored address AND token, but wallet changed, force logout
-    if (storedAddress && storedToken && storedAddress !== currentWalletAddress) {
-      console.log('🔄 Wallet switched from', storedAddress, 'to', currentWalletAddress);
+    // If we have a stored wallet AND token, but wallet changed, force logout
+    if (storedWallet && storedToken && storedWallet !== currentWalletAddress) {
+      console.log('🔄 Wallet switched from', storedWallet, 'to', currentWalletAddress);
       console.log('🚪 Auto-logging out due to wallet change...');
 
       // Clear everything
-      clearStoredToken();
+      clearStoredSession();
       clearAddress();
+      clearSession();
       queryClient.clear();
       globalLoginLock = false;
 
       // Update to new address (this will trigger login flow below)
       setAddress(currentWalletAddress);
     }
-  }, [publicKey, clearAddress, setAddress]);
+  }, [publicKey, clearAddress, clearSession, setAddress]);
 
   // Handle wallet connection and login flow
   useEffect(() => {
     if (connected && publicKey) {
       const walletAddress = publicKey.toBase58();
-      const storedAddress = useWalletStore.getState().address;
 
-      // Update the address if not set or different
-      if (storedAddress !== walletAddress) {
-        setAddress(walletAddress);
-      }
+      // Always update zustand address to match current wallet
+      setAddress(walletAddress);
 
-      // Check if already authenticated or token exists for the current wallet
+      // Check if token exists AND belongs to the current wallet
       const existingToken = getStoredToken();
-      if (existingToken && storedAddress === walletAddress) {
-        // Token exists and matches current wallet
+      const storedWallet = getStoredWallet();
+
+      if (existingToken && storedWallet === walletAddress) {
+        // Token exists and matches current wallet - restore session
         console.log('Session token exists for current wallet, restoring session');
         setSession(existingToken);
-      } else if (!existingToken && !globalLoginLock) {
-        // No token and not already logging in - trigger login
-        console.log('No session token, triggering SIWS login...');
+      } else if (!globalLoginLock) {
+        // No valid token for this wallet - trigger login
+        console.log('No valid session token for wallet, triggering SIWS login...');
         performSiwsLogin();
       }
     }
