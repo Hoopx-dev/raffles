@@ -105,8 +105,8 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({
     const mobile = isMobile();
 
     if (mobile) {
-      // Mobile: Jupiter deeplink first, then other wallets via WalletConnect
-      return [jupiterAdapter, reownAdapter];
+      // Mobile: Jupiter first, Phantom/Solflare for direct deep link, then reown for other wallets
+      return [jupiterAdapter, new PhantomWalletAdapter(), new SolflareWalletAdapter(), reownAdapter];
     } else {
       // Desktop: Browser extension wallets + WalletConnect (Jupiter extension auto-detected by reown)
       return [
