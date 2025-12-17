@@ -97,14 +97,14 @@ export function WonModal({ isOpen, onClose }: WonModalProps) {
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-2">Actual Score</p>
                 <p className="text-lg font-bold text-gray-800">
-                  {actualHomeScore} : {actualAwayScore}
+                  {actualAwayScore} : {actualHomeScore}
                 </p>
               </div>
               {/* Your Prediction */}
               <div className="text-center">
                 <p className="text-xs text-gray-500 mb-2">Your Prediction</p>
                 <p className="text-lg font-bold text-[#1B5E20]">
-                  {placement.predictHomeScore} : {placement.predictAwayScore}
+                  {placement.predictAwayScore} : {placement.predictHomeScore}
                 </p>
               </div>
             </div>

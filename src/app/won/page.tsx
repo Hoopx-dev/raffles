@@ -81,7 +81,7 @@ function WonPageContent() {
   };
 
   const handleShare = () => {
-    const text = `I won ${totalPrize} USDT in the HoopXmas Raffle! My prediction was ${primaryTicket?.placementInfo?.predictHomeScore}:${primaryTicket?.placementInfo?.predictAwayScore}. Join the fun at hoopx.gg!`;
+    const text = `I won ${totalPrize} USDT in the HoopXmas Raffle! My prediction was ${primaryTicket?.placementInfo?.predictAwayScore}:${primaryTicket?.placementInfo?.predictHomeScore}. Join the fun at hoopx.gg!`;
     if (navigator.share) {
       navigator.share({
         title: 'HoopXmas Raffle Winner!',
@@ -153,13 +153,13 @@ function WonPageContent() {
           </div>
           <div className="flex items-center justify-center gap-8">
             <div className="text-center">
-              <p className="text-xs text-[#91000A] uppercase mb-1">Home Team</p>
-              <p className="text-4xl font-bold text-gray-800">{actualHomeScore}</p>
+              <p className="text-xs text-[#91000A] uppercase mb-1">Away Team</p>
+              <p className="text-4xl font-bold text-gray-800">{actualAwayScore}</p>
             </div>
             <span className="text-2xl font-bold text-[#91000A]">VS</span>
             <div className="text-center">
-              <p className="text-xs text-[#91000A] uppercase mb-1">Away Team</p>
-              <p className="text-4xl font-bold text-gray-800">{actualAwayScore}</p>
+              <p className="text-xs text-[#91000A] uppercase mb-1">Home Team</p>
+              <p className="text-4xl font-bold text-gray-800">{actualHomeScore}</p>
             </div>
           </div>
         </div>
@@ -177,16 +177,16 @@ function WonPageContent() {
           </div>
           <div className="flex items-center justify-center gap-8">
             <div className="text-center">
-              <p className="text-xs text-[#91000A] uppercase mb-1">Home Team</p>
-              <p className="text-4xl font-bold text-[#91000A] border-b-2 border-[#91000A] pb-1">
-                {placement.predictHomeScore}
+              <p className="text-xs text-[#1B5E20] uppercase mb-1">Away Team</p>
+              <p className="text-4xl font-bold text-[#1B5E20]">
+                {placement.predictAwayScore}
               </p>
             </div>
             <span className="text-2xl font-bold text-gray-400">VS</span>
             <div className="text-center">
-              <p className="text-xs text-[#1B5E20] uppercase mb-1">Away Team</p>
-              <p className="text-4xl font-bold text-[#1B5E20]">
-                {placement.predictAwayScore}
+              <p className="text-xs text-[#91000A] uppercase mb-1">Home Team</p>
+              <p className="text-4xl font-bold text-[#91000A] border-b-2 border-[#91000A] pb-1">
+                {placement.predictHomeScore}
               </p>
             </div>
           </div>
@@ -202,16 +202,16 @@ function WonPageContent() {
             {otherWinningTickets.slice(0, 1).map((ticket) => (
               <div key={ticket.id} className="flex items-center justify-center gap-8">
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 uppercase mb-1">Home Team</p>
+                  <p className="text-xs text-gray-500 uppercase mb-1">Away Team</p>
                   <p className="text-3xl font-bold text-gray-800">
-                    {ticket.placementInfo?.predictHomeScore}
+                    {ticket.placementInfo?.predictAwayScore}
                   </p>
                 </div>
                 <span className="text-xl font-bold text-gray-400">VS</span>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 uppercase mb-1">Away Team</p>
+                  <p className="text-xs text-gray-500 uppercase mb-1">Home Team</p>
                   <p className="text-3xl font-bold text-gray-800">
-                    {ticket.placementInfo?.predictAwayScore}
+                    {ticket.placementInfo?.predictHomeScore}
                   </p>
                 </div>
               </div>
