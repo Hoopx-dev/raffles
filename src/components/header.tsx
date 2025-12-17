@@ -67,21 +67,31 @@ export function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Countdown timer
+  // Countdown timer - use last game's start time
   useEffect(() => {
-    const endTime = homeData?.eventInfo?.endTime;
-    if (!endTime) return;
+    const gameList = homeData?.gameList;
+    if (!gameList || gameList.length === 0) return;
+
+    // Find the last game's start time (latest gameTime)
+    const lastGameTime = gameList.reduce((latest, game) => {
+      const gameTime = parseBeijingTime(game.gameTime).getTime();
+      return gameTime > latest ? gameTime : latest;
+    }, 0);
+
+    if (lastGameTime === 0) return;
+
+    const lastGameTimeStr = new Date(lastGameTime).toISOString();
 
     // Initial calculation
-    setTimeRemaining(calculateTimeRemaining(endTime));
+    setTimeRemaining(calculateTimeRemaining(lastGameTimeStr));
 
     // Update every second
     const interval = setInterval(() => {
-      setTimeRemaining(calculateTimeRemaining(endTime));
+      setTimeRemaining(calculateTimeRemaining(lastGameTimeStr));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [homeData?.eventInfo?.endTime]);
+  }, [homeData?.gameList]);
 
   const handleWalletClick = () => {
     if (connected) {

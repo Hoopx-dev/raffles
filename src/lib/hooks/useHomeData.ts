@@ -94,10 +94,18 @@ export function useEventStatus() {
   const isEventActive = data?.eventInfo?.status === 1;
   const isEventEnded = data?.eventInfo?.status === 2;
 
-  // Check if betting is closed (countdown expired)
-  // Use parseBeijingTime since API returns Beijing time
-  const endTime = data?.eventInfo?.endTime;
-  const isBettingClosed = endTime ? parseBeijingTime(endTime).getTime() <= Date.now() : false;
+  // Check if betting is closed (last game has started)
+  // Find the last game's start time from gameList
+  const gameList = data?.gameList;
+  let isBettingClosed = false;
+
+  if (gameList && gameList.length > 0) {
+    const lastGameTime = gameList.reduce((latest, game) => {
+      const gameTime = parseBeijingTime(game.gameTime).getTime();
+      return gameTime > latest ? gameTime : latest;
+    }, 0);
+    isBettingClosed = lastGameTime > 0 && lastGameTime <= Date.now();
+  }
 
   return { isEventActive, isBettingClosed, isEventEnded };
 }
