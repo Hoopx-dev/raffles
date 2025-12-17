@@ -75,16 +75,14 @@ export function buildUrlWithReferral(baseUrl: string, referralAddress?: string):
 
 /**
  * Open Phantom app on mobile with URL
- * Docs: https://docs.phantom.com/phantom-deeplinks/other-methods/browse
  */
 export function openInPhantomApp(): void {
   if (typeof window === 'undefined') return;
 
   const currentUrl = encodeURIComponent(window.location.href);
-  const refUrl = encodeURIComponent(window.location.origin);
 
-  // Phantom universal link format (works on both iOS and Android)
-  const deepLink = `https://phantom.app/ul/browse/${currentUrl}?ref=${refUrl}`;
+  // Phantom native deep link scheme
+  const deepLink = `phantom://browse/${currentUrl}`;
 
   console.log('Phantom deep link:', deepLink);
   window.location.href = deepLink;
