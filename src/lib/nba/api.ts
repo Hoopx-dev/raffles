@@ -143,9 +143,9 @@ export function groupGamesByDate(games: ProcessedGame[]): GamesByDate[] {
     grouped.set(game.dateKey, [...existing, game]);
   });
 
-  // Sort by date descending (most recent first)
+  // Sort by date ascending (earliest first)
   return Array.from(grouped.entries())
-    .sort((a, b) => b[0].localeCompare(a[0]))
+    .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([dateKey, dateGames]) => ({
       dateKey,
       date: dateGames[0].date,
