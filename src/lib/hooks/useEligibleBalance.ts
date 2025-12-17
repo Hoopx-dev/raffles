@@ -121,8 +121,18 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
         // Skip transactions before cutoff date
         if (tx.timestamp < ELIGIBILITY_CUTOFF_TIMESTAMP) continue;
 
-        // Only count DEX swap transactions (Jupiter, Raydium, Orca, etc.)
-        const DEX_SOURCES = ['JUPITER', 'RAYDIUM', 'ORCA', 'METEORA', 'PHOENIX'];
+        // Only count DEX swap transactions (Jupiter aggregates through various routers)
+        const DEX_SOURCES = [
+          'JUPITER',
+          'RAYDIUM',
+          'ORCA',
+          'METEORA',
+          'PHOENIX',
+          'OKX_DEX_ROUTER', // Jupiter routes through OKX
+          'DFLOW',          // Jupiter routes through DFlow
+          'OPENBOOK',
+          'WHIRLPOOL',
+        ];
         if (!DEX_SOURCES.includes(tx.source)) {
           continue;
         }
