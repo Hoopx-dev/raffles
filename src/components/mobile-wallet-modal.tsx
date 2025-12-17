@@ -64,15 +64,15 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
         return;
       }
 
-      // Special handling for Phantom on Android - use deep link
-      if (walletName === 'Phantom' && isAndroid && isInMobileBrowser()) {
+      // Special handling for Phantom on mobile - use deep link
+      if (walletName === 'Phantom' && isInMobileBrowser()) {
         onClose();
         openInPhantomApp();
         return;
       }
 
-      // Special handling for Solflare on Android - use deep link
-      if (walletName === 'Solflare' && isAndroid && isInMobileBrowser()) {
+      // Special handling for Solflare on mobile - use deep link
+      if (walletName === 'Solflare' && isInMobileBrowser()) {
         onClose();
         openInSolflareApp();
         return;
