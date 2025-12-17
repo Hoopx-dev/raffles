@@ -37,6 +37,14 @@ export function isMobileDevice(): boolean {
 }
 
 /**
+ * Detect if user is on Android device
+ */
+export function isAndroidDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return /Android/i.test(navigator.userAgent);
+}
+
+/**
  * Detect if user is in mobile browser (not wallet app)
  */
 export function isInMobileBrowser(): boolean {

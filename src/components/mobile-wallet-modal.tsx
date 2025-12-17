@@ -3,7 +3,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { isInMobileBrowser, isInJupiterBrowser, openInJupiterApp } from '@/lib/utils/mobile-deeplink';
+import { isInMobileBrowser, isInJupiterBrowser, isAndroidDevice, openInJupiterApp } from '@/lib/utils/mobile-deeplink';
 
 interface MobileWalletModalProps {
   isOpen: boolean;
@@ -23,10 +23,16 @@ const getWalletDisplayName = (walletName: string): string => {
 export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModalProps) {
   const { wallets, select, connecting } = useWallet();
 
-  // Filter wallets: hide Jupiter Mobile if already in Jupiter app
+  // Filter wallets: hide Jupiter Mobile if already in Jupiter app, hide Mobile Wallet Adapter on Android
   const inJupiterBrowser = isInJupiterBrowser();
+  const isAndroid = isAndroidDevice();
   const filteredWallets = wallets.filter(wallet => {
+    // Hide Jupiter Mobile if already in Jupiter app
     if (wallet.adapter.name === 'Jupiter Mobile' && inJupiterBrowser) {
+      return false;
+    }
+    // Hide Mobile Wallet Adapter on Android (causes issues)
+    if (wallet.adapter.name === 'Mobile Wallet Adapter' && isAndroid) {
       return false;
     }
     return true;
