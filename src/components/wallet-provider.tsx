@@ -12,7 +12,8 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { clusterApiUrl } from "@solana/web3.js";
-import { FC, ReactNode, useEffect, useMemo } from "react";
+import { FC, ReactNode, useEffect, useMemo, useState } from "react";
+import { isInWalletBrowser } from "@/lib/utils/mobile-deeplink";
 
 // Import wallet adapter CSS
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -117,9 +118,18 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({
     }
   }, [reownAdapter, jupiterAdapter]);
 
+  // Enable autoConnect when inside a wallet browser (Jupiter, Phantom, etc.)
+  // This allows seamless connection when user opens via deep link
+  const [shouldAutoConnect, setShouldAutoConnect] = useState(false);
+
+  useEffect(() => {
+    // Check on client side only
+    setShouldAutoConnect(isInWalletBrowser());
+  }, []);
+
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
+      <WalletProvider wallets={wallets} autoConnect={shouldAutoConnect}>
         <WalletModalProvider>
           <AutoConnectOnSelect>{children}</AutoConnectOnSelect>
         </WalletModalProvider>
