@@ -8,25 +8,15 @@ import { useTicketList } from './useTickets';
 // ============================================
 // ELIGIBILITY CUTOFF DATE - Change this to adjust when swaps become eligible
 // Only HOOPX tokens received AFTER this date can be used for ticket redemption
-// Uses local timezone midnight so Beijing users get Beijing Dec 17 00:00
+// Fixed to Beijing timezone (UTC+8) - Dec 17 00:00 Beijing = Dec 16 16:00 UTC
 // ============================================
-const ELIGIBILITY_CUTOFF_YEAR = 2025;
-const ELIGIBILITY_CUTOFF_MONTH = 12; // December (1-indexed)
-const ELIGIBILITY_CUTOFF_DAY = 17;
+// Dec 17, 2025 00:00:00 Beijing time (UTC+8) = Dec 16, 2025 16:00:00 UTC
+const ELIGIBILITY_CUTOFF_DATE = '2025-12-16T16:00:00Z';
+const ELIGIBILITY_CUTOFF_TIMESTAMP = Math.floor(new Date(ELIGIBILITY_CUTOFF_DATE).getTime() / 1000);
+const ELIGIBILITY_CUTOFF_MS = new Date(ELIGIBILITY_CUTOFF_DATE).getTime();
 
-// Calculate local midnight for the cutoff date
-function getLocalCutoffTimestamp(): number {
-  const localMidnight = new Date(ELIGIBILITY_CUTOFF_YEAR, ELIGIBILITY_CUTOFF_MONTH - 1, ELIGIBILITY_CUTOFF_DAY, 0, 0, 0, 0);
-  return Math.floor(localMidnight.getTime() / 1000);
-}
-
-function getLocalCutoffMs(): number {
-  const localMidnight = new Date(ELIGIBILITY_CUTOFF_YEAR, ELIGIBILITY_CUTOFF_MONTH - 1, ELIGIBILITY_CUTOFF_DAY, 0, 0, 0, 0);
-  return localMidnight.getTime();
-}
-
-// Formatted date for display (e.g., "Dec 17")
-export const ELIGIBILITY_CUTOFF_DISPLAY = `Dec ${ELIGIBILITY_CUTOFF_DAY}`;
+// Formatted date for display
+export const ELIGIBILITY_CUTOFF_DISPLAY = 'Dec 17 (Beijing)';
 
 // HOOPX token mint address
 const HOOPX_MINT = process.env.NEXT_PUBLIC_HOOPX_MINT || '11111111111111111111111111111111';
@@ -86,7 +76,7 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
   // Count tickets created after the cutoff date
   const ticketsAfterCutoff = ticketData?.records?.filter((ticket) => {
     const ticketTime = new Date(ticket.createTime).getTime();
-    return ticketTime >= getLocalCutoffMs();
+    return ticketTime >= ELIGIBILITY_CUTOFF_MS;
   }) || [];
   const ticketsRedeemedAfterCutoff = ticketsAfterCutoff.length;
   const hoopxUsedForTickets = ticketsRedeemedAfterCutoff * ticketPrice;
@@ -129,7 +119,7 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
 
       for (const tx of transactions) {
         // Skip transactions before cutoff date
-        if (tx.timestamp < getLocalCutoffTimestamp()) continue;
+        if (tx.timestamp < ELIGIBILITY_CUTOFF_TIMESTAMP) continue;
 
         // Only count DEX swap transactions (Jupiter, Raydium, Orca, etc.)
         const DEX_SOURCES = ['JUPITER', 'RAYDIUM', 'ORCA', 'METEORA', 'PHOENIX'];
