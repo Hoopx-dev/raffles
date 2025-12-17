@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTabStore } from '@/lib/store/useTabStore';
@@ -24,6 +24,7 @@ export function MyTicketsTab() {
   const [currentPage, setCurrentPage] = useState(1);
   const openRedeemModal = useUIStore((s) => s.openRedeemModal);
   const { t } = useTranslation();
+  const ticketListRef = useRef<HTMLDivElement>(null);
 
   // Get event ID from home data
   const { data: homeData } = useHomeData();
@@ -171,7 +172,7 @@ export function MyTicketsTab() {
       )}
 
       {/* Ticket List */}
-      <div className="space-y-4">
+      <div ref={ticketListRef} className="space-y-4">
         {paginatedTickets.map((ticket) =>
           ticket.status === 'UNUSED' ? (
             <UnbetTicketCard key={ticket.id} ticket={ticket} eventId={eventId} />
@@ -191,7 +192,7 @@ export function MyTicketsTab() {
             <button
               onClick={() => {
                 setCurrentPage((p) => Math.max(1, p - 1));
-                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                setTimeout(() => ticketListRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
               }}
               disabled={currentPage === 1}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed enabled:cursor-pointer"
@@ -204,7 +205,7 @@ export function MyTicketsTab() {
             <button
               onClick={() => {
                 setCurrentPage((p) => Math.min(totalPages, p + 1));
-                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                setTimeout(() => ticketListRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
               }}
               disabled={currentPage === totalPages}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed enabled:cursor-pointer"
