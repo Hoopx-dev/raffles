@@ -38,23 +38,7 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
     return true;
   });
 
-  // Close on ESC key
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
+  // Handle wallet selection - must be defined before early return (Rules of Hooks)
   const handleWalletSelect = useCallback(async (walletName: string) => {
     try {
       // Special handling for Jupiter on mobile browser - direct deep link
@@ -92,6 +76,23 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
       console.error('Failed to select wallet:', error);
     }
   }, [onClose, select, connect, wallet]);
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
