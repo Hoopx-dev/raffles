@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletStore, setGlobalDisconnect } from '@/lib/store/useWalletStore';
+import { useWalletStore, setGlobalDisconnect, setGlobalSelect } from '@/lib/store/useWalletStore';
 import { getNonce, siwsLogin, createSiwsMessage } from '@/lib/api/auth';
 import { queryClient } from '@/components/providers';
 import bs58 from 'bs58';
@@ -36,13 +36,14 @@ function clearStoredSession(): void {
 let globalLoginLock = false;
 
 export function useAuth() {
-  const { publicKey, signMessage, connected, disconnect } = useWallet();
+  const { publicKey, signMessage, connected, disconnect, select } = useWallet();
   const { setAddress, setSession, clearAddress, clearSession, sessionToken, isAuthenticated } = useWalletStore();
 
-  // Register global disconnect function for API 401 handlers
+  // Register global disconnect and select functions for API 401 handlers
   useEffect(() => {
     setGlobalDisconnect(disconnect);
-  }, [disconnect]);
+    setGlobalSelect(select);
+  }, [disconnect, select]);
 
   // On mount, restore session from localStorage
   useEffect(() => {
@@ -114,7 +115,7 @@ export function useAuth() {
     }
   }, [publicKey, signMessage, setSession, clearSession]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     console.log('Logging out - clearing all session data');
     // Clear localStorage session (token + wallet)
     clearStoredSession();
@@ -126,8 +127,10 @@ export function useAuth() {
     // Reset login state
     globalLoginLock = false;
     // Disconnect wallet
-    disconnect();
-  }, [clearAddress, clearSession, disconnect]);
+    await disconnect();
+    // Deselect wallet to reset adapter state (fixes mobile reconnect issue)
+    select(null);
+  }, [clearAddress, clearSession, disconnect, select]);
 
   // Handle wallet connection and detect wallet switches
   useEffect(() => {
