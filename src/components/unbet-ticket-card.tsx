@@ -86,18 +86,20 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
     );
   };
 
+  const isClosed = isBettingClosed || isEventEnded;
+
   return (
     <div className="bg-bg-card rounded-2xl p-4 shadow-sm">
-      {/* Header */}
+      {/* Header - hide PENDING badge when closed */}
       <div className="flex items-center justify-between mb-4">
         <span className="text-text-dark font-bold">{ticket.ticketCode}</span>
-        <Badge variant="unbet">{t.tabs.unbet}</Badge>
+        {!isClosed && <Badge variant="unbet">{t.tabs.unbet}</Badge>}
       </div>
 
-      {/* Score Inputs - hide when betting closed or event ended */}
-      {(isBettingClosed || isEventEnded) ? (
+      {/* When closed, only show message - no inputs */}
+      {isClosed ? (
         <div className="text-center py-4 text-text-muted text-sm">
-          Betting is closed.
+          Event has ended.
         </div>
       ) : (
         <>
