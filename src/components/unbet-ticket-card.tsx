@@ -99,7 +99,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
       {/* When closed, only show message - no inputs */}
       {isClosed ? (
         <div className="text-center py-4 text-gray-500 text-sm">
-          Event has ended.
+          {isEventEnded ? 'Event has ended.' : 'Betting is closed.'}
         </div>
       ) : (
         <>
