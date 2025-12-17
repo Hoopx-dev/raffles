@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useEligibleBalance, ELIGIBILITY_CUTOFF_DISPLAY } from '@/lib/hooks/useEligibleBalance';
+import { getHoopxBalance } from '@/lib/solana/burnTokens';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
 import { QuantitySelector } from './ui/quantity-selector';
@@ -18,8 +21,13 @@ interface RedeemModalProps {
 
 export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalProps) {
   const { isRedeemModalOpen, closeRedeemModal, openConfirmModal } = useUIStore();
+  const { publicKey } = useWallet();
+  const { connection } = useConnection();
+  const queryClient = useQueryClient();
   const hoopxBalance = useWalletStore((s) => s.hoopxBalance);
+  const setHoopxBalance = useWalletStore((s) => s.setHoopxBalance);
   const [quantity, setQuantity] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { t } = useTranslation();
 
   // Get swap history from Helius - only fetch when modal is open
@@ -33,12 +41,30 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
   // Can redeem if available quota covers the cost
   const canRedeem = availableQuota >= totalCost;
 
-  // Reset quantity when modal opens
+  // Refetch balances when modal opens
   useEffect(() => {
-    if (isRedeemModalOpen) {
+    if (isRedeemModalOpen && publicKey) {
       setQuantity(1);
+      setIsRefreshing(true);
+
+      // Refetch wallet HOOPX balance
+      getHoopxBalance(connection, publicKey)
+        .then((balance) => {
+          console.log('Refreshed HOOPX balance:', balance);
+          setHoopxBalance(balance);
+        })
+        .catch((error) => {
+          console.error('Failed to refresh HOOPX balance:', error);
+        });
+
+      // Invalidate eligible balance query to force refetch
+      queryClient.invalidateQueries({ queryKey: ['swap-history-helius', publicKey.toBase58()] });
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+
+      // Clear refreshing state after a short delay
+      setTimeout(() => setIsRefreshing(false), 500);
     }
-  }, [isRedeemModalOpen]);
+  }, [isRedeemModalOpen, publicKey, connection, setHoopxBalance, queryClient]);
 
   const handleRedeem = () => {
     openConfirmModal(quantity);
@@ -82,7 +108,7 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           <div className="flex justify-between text-sm">
             <span className="text-text-muted">Available to Redeem</span>
             <span className={`font-medium ${availableQuota > 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {isLoadingSwaps ? '...' : `${formatNumber(availableQuota)} HOOPX`}
+              {isLoadingSwaps || isRefreshing ? '...' : `${formatNumber(availableQuota)} HOOPX`}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -117,9 +143,9 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           fullWidth
           size="lg"
           onClick={handleRedeem}
-          disabled={!canRedeem || quantity === 0 || isLoadingSwaps}
+          disabled={!canRedeem || quantity === 0 || isLoadingSwaps || isRefreshing}
         >
-          {isLoadingSwaps ? 'Checking...' : `${t.modals.redeem.redeem} - ${formatNumber(totalCost)} HOOPX`}
+          {isLoadingSwaps || isRefreshing ? 'Checking...' : `${t.modals.redeem.redeem} - ${formatNumber(totalCost)} HOOPX`}
         </Button>
       </div>
     </Modal>
