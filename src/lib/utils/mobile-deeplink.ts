@@ -74,6 +74,19 @@ export function buildUrlWithReferral(baseUrl: string, referralAddress?: string):
 }
 
 /**
+ * Open a deep link without changing the current page URL
+ * This prevents the browser from redirecting on refresh
+ */
+function openDeepLink(deepLink: string): void {
+  const anchor = document.createElement('a');
+  anchor.href = deepLink;
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+}
+
+/**
  * Open Phantom app on mobile with URL
  */
 export function openInPhantomApp(): void {
@@ -85,7 +98,7 @@ export function openInPhantomApp(): void {
   const deepLink = `phantom://browse/${currentUrl}`;
 
   console.log('Phantom deep link:', deepLink);
-  window.location.href = deepLink;
+  openDeepLink(deepLink);
 }
 
 /**
@@ -100,7 +113,7 @@ export function openInSolflareApp(): void {
   const deepLink = `solflare://browse/${currentUrl}`;
 
   console.log('Solflare deep link:', deepLink);
-  window.location.href = deepLink;
+  openDeepLink(deepLink);
 }
 
 /**
