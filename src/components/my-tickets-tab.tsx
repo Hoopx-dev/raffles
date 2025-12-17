@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTabStore } from '@/lib/store/useTabStore';
@@ -63,10 +63,13 @@ export function MyTicketsTab() {
     return tickets.slice(startIndex, startIndex + TICKETS_PER_PAGE);
   }, [tickets, currentPage]);
 
-  // Reset to page 1 when tab changes
+  // Reset to page 1 when tab changes (including programmatic changes like after placing bet)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [ticketSubTab]);
+
   const handleTabChange = (tab: 'unbet' | 'bet') => {
     setTicketSubTab(tab);
-    setCurrentPage(1);
   };
 
   const handleConnect = () => {
