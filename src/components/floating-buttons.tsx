@@ -49,13 +49,16 @@ export function FloatingButtons() {
   }, [connected, showMobileModal]);
 
   const handleButtonClick = () => {
+    console.log('handleButtonClick - connected:', connected, 'isMobileDevice:', isMobileDevice());
     if (connected) {
       openRedeemModal();
     } else {
       // On mobile, show custom modal; on desktop, show standard modal
       if (isMobileDevice()) {
+        console.log('Showing mobile wallet modal');
         setShowMobileModal(true);
       } else {
+        console.log('Showing standard wallet modal');
         setVisible(true);
       }
     }

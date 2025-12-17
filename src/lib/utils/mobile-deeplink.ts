@@ -129,7 +129,8 @@ export function openInJupiterApp(referralAddress?: string): void {
   const deepLink = `jupiter://browse/${encodeURIComponent(currentUrl)}`;
 
   console.log('Jupiter deep link:', deepLink);
-  window.location.href = deepLink;
+  // Use openDeepLink instead of window.location.href to avoid caching issues
+  openDeepLink(deepLink);
 
   // Fallback: If Jupiter app doesn't open in 2 seconds, open app store
   const timeout = setTimeout(() => {

@@ -56,9 +56,14 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
   if (!isOpen) return null;
 
   const handleWalletSelect = async (walletName: string) => {
+    console.log('handleWalletSelect called:', walletName);
+    console.log('isInMobileBrowser:', isInMobileBrowser());
+    console.log('isInJupiterBrowser:', isInJupiterBrowser());
+
     try {
       // Special handling for Jupiter on mobile browser - direct deep link
       if (walletName === 'Jupiter Mobile' && isInMobileBrowser()) {
+        console.log('Opening Jupiter app via deep link...');
         onClose();
         openInJupiterApp();
         return;
@@ -66,6 +71,7 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
 
       // Special handling for Phantom on mobile - use deep link
       if (walletName === 'Phantom' && isInMobileBrowser()) {
+        console.log('Opening Phantom app via deep link...');
         onClose();
         openInPhantomApp();
         return;
@@ -73,12 +79,14 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
 
       // Special handling for Solflare on mobile - use deep link
       if (walletName === 'Solflare' && isInMobileBrowser()) {
+        console.log('Opening Solflare app via deep link...');
         onClose();
         openInSolflareApp();
         return;
       }
 
       // Select wallet - AutoConnectOnSelect component will trigger connect()
+      console.log('Selecting wallet via adapter:', walletName);
       select(walletName as import('@solana/wallet-adapter-base').WalletName);
       onClose();
     } catch (error) {
