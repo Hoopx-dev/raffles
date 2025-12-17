@@ -9,7 +9,7 @@ import { useTicketList } from './useTickets';
 // ELIGIBILITY CUTOFF DATE - Change this to adjust when swaps become eligible
 // Only HOOPX tokens received AFTER this date can be used for ticket redemption
 // ============================================
-export const ELIGIBILITY_CUTOFF_DATE = '2025-12-15T00:00:00Z';
+export const ELIGIBILITY_CUTOFF_DATE = '2025-12-17T00:00:00Z';
 const ELIGIBILITY_CUTOFF_TIMESTAMP = Math.floor(new Date(ELIGIBILITY_CUTOFF_DATE).getTime() / 1000);
 const ELIGIBILITY_CUTOFF_MS = new Date(ELIGIBILITY_CUTOFF_DATE).getTime();
 
