@@ -1,7 +1,7 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { isInMobileBrowser, isInJupiterBrowser, isAndroidDevice, openInJupiterApp, openInPhantomApp, openInSolflareApp } from '@/lib/utils/mobile-deeplink';
 
@@ -21,7 +21,7 @@ const getWalletDisplayName = (walletName: string): string => {
 };
 
 export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModalProps) {
-  const { wallets, select, connecting } = useWallet();
+  const { wallets, select, connect, connecting, wallet } = useWallet();
 
   // Filter wallets: hide Jupiter Mobile if already in Jupiter app, hide Mobile Wallet Adapter on Android
   const inJupiterBrowser = isInJupiterBrowser();
@@ -55,15 +55,10 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
 
   if (!isOpen) return null;
 
-  const handleWalletSelect = async (walletName: string) => {
-    console.log('handleWalletSelect called:', walletName);
-    console.log('isInMobileBrowser:', isInMobileBrowser());
-    console.log('isInJupiterBrowser:', isInJupiterBrowser());
-
+  const handleWalletSelect = useCallback(async (walletName: string) => {
     try {
       // Special handling for Jupiter on mobile browser - direct deep link
       if (walletName === 'Jupiter Mobile' && isInMobileBrowser()) {
-        console.log('Opening Jupiter app via deep link...');
         onClose();
         openInJupiterApp();
         return;
@@ -71,7 +66,6 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
 
       // Special handling for Phantom on mobile - use deep link
       if (walletName === 'Phantom' && isInMobileBrowser()) {
-        console.log('Opening Phantom app via deep link...');
         onClose();
         openInPhantomApp();
         return;
@@ -79,20 +73,25 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
 
       // Special handling for Solflare on mobile - use deep link
       if (walletName === 'Solflare' && isInMobileBrowser()) {
-        console.log('Opening Solflare app via deep link...');
         onClose();
         openInSolflareApp();
         return;
       }
 
-      // Select wallet - AutoConnectOnSelect component will trigger connect()
-      console.log('Selecting wallet via adapter:', walletName);
+      // Select the wallet
       select(walletName as import('@solana/wallet-adapter-base').WalletName);
+
+      // If same wallet is already selected, manually trigger connect
+      // (AutoConnectOnSelect won't re-trigger if wallet reference doesn't change)
+      if (wallet?.adapter.name === walletName) {
+        await connect();
+      }
+
       onClose();
     } catch (error) {
       console.error('Failed to select wallet:', error);
     }
-  };
+  }, [onClose, select, connect, wallet]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
