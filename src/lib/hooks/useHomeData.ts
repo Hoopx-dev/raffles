@@ -95,16 +95,23 @@ export function useEventStatus() {
   const isEventEnded = data?.eventInfo?.status === 2;
 
   // Check if betting is closed (last game has started)
-  // Find the last game's start time from gameList
   const gameList = data?.gameList;
   let isBettingClosed = false;
 
   if (gameList && gameList.length > 0) {
-    const lastGameTime = gameList.reduce((latest, game) => {
+    // Find the last game (latest gameTime)
+    const lastGame = gameList.reduce((latest, game) => {
       const gameTime = parseBeijingTime(game.gameTime).getTime();
-      return gameTime > latest ? gameTime : latest;
-    }, 0);
-    isBettingClosed = lastGameTime > 0 && lastGameTime <= Date.now();
+      const latestTime = parseBeijingTime(latest.gameTime).getTime();
+      return gameTime > latestTime ? game : latest;
+    }, gameList[0]);
+
+    // Betting is closed if:
+    // 1. Last game has started (status is LIVE or FINAL), OR
+    // 2. Current time is past last game's start time
+    const lastGameTime = parseBeijingTime(lastGame.gameTime).getTime();
+    const lastGameStarted = lastGame.status === 'LIVE' || lastGame.status === 'FINAL';
+    isBettingClosed = lastGameStarted || lastGameTime <= Date.now();
   }
 
   return { isEventActive, isBettingClosed, isEventEnded };
