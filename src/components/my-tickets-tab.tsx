@@ -191,7 +191,7 @@ export function MyTicketsTab() {
             <button
               onClick={() => {
                 setCurrentPage((p) => Math.max(1, p - 1));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
               }}
               disabled={currentPage === 1}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed enabled:cursor-pointer"
@@ -204,7 +204,7 @@ export function MyTicketsTab() {
             <button
               onClick={() => {
                 setCurrentPage((p) => Math.min(totalPages, p + 1));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
               }}
               disabled={currentPage === totalPages}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white disabled:opacity-30 disabled:cursor-not-allowed enabled:cursor-pointer"
