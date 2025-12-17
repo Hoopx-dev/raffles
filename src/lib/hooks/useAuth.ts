@@ -127,8 +127,8 @@ export function useAuth() {
     globalLoginLock = false;
     // Disconnect wallet
     await disconnect();
-    // Note: Don't call select(null) as it can cause issues with mobile wallet adapters
-    // The adapter will be re-selected when user clicks connect again
+    // Reload page to fully reset wallet adapter state (fixes mobile reconnect issues)
+    window.location.reload();
   }, [clearAddress, clearSession, disconnect]);
 
   // Handle wallet connection and detect wallet switches
