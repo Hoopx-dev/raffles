@@ -47,28 +47,7 @@ export function GameCard({ game }: GameCardProps) {
 
       {/* Teams and Score */}
       <div className="flex items-start justify-between">
-        {/* Home Team */}
-        <div className="flex flex-col items-center flex-1">
-          <div className="w-16 h-16 relative mb-2">
-            <Image
-              src={homeTeam.logo}
-              alt={homeTeam.name}
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </div>
-          <span className="text-[#183824] text-sm font-medium text-center">{homeTeam.name}</span>
-        </div>
-
-        {/* Score */}
-        <div className="flex items-center gap-3 px-4">
-          <span className="text-2xl font-bold text-[#183824]">{homeTeam.score}</span>
-          <span className="text-xl text-[#326046]">:</span>
-          <span className="text-2xl font-bold text-[#183824]">{awayTeam.score}</span>
-        </div>
-
-        {/* Away Team */}
+        {/* Away Team (Left) */}
         <div className="flex flex-col items-center flex-1">
           <div className="w-16 h-16 relative mb-2">
             <Image
@@ -80,6 +59,27 @@ export function GameCard({ game }: GameCardProps) {
             />
           </div>
           <span className="text-[#183824] text-sm font-medium text-center">{awayTeam.name}</span>
+        </div>
+
+        {/* Score */}
+        <div className="flex items-center gap-3 px-4">
+          <span className="text-2xl font-bold text-[#183824]">{awayTeam.score}</span>
+          <span className="text-xl text-[#326046]">:</span>
+          <span className="text-2xl font-bold text-[#183824]">{homeTeam.score}</span>
+        </div>
+
+        {/* Home Team (Right) */}
+        <div className="flex flex-col items-center flex-1">
+          <div className="w-16 h-16 relative mb-2">
+            <Image
+              src={homeTeam.logo}
+              alt={homeTeam.name}
+              fill
+              className="object-contain"
+              unoptimized
+            />
+          </div>
+          <span className="text-[#183824] text-sm font-medium text-center">{homeTeam.name}</span>
         </div>
       </div>
     </div>

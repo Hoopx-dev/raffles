@@ -27,26 +27,26 @@ export function CumulativeScore({
         }}
       >
         <div className='flex items-center justify-center gap-6'>
-          {/* Home Teams */}
-          <div className='text-center flex-1'>
-            <p className='text-4xl font-bold text-[#D99739]'>
-              {formatNumber(homeTeams)}
-            </p>
-            <p className='text-white/80 text-xs uppercase tracking-wider mt-1'>
-              {t.cumulative.homeTeams}
-            </p>
-          </div>
-
-          {/* Divider */}
-          <div className='text-3xl font-bold text-white/60'>:</div>
-
-          {/* Away Teams */}
+          {/* Away Teams (Left) */}
           <div className='text-center flex-1'>
             <p className='text-4xl font-bold text-[#D99739]'>
               {formatNumber(awayTeams)}
             </p>
             <p className='text-white/80 text-xs uppercase tracking-wider mt-1'>
               {t.cumulative.awayTeams}
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className='text-3xl font-bold text-white/60'>:</div>
+
+          {/* Home Teams (Right) */}
+          <div className='text-center flex-1'>
+            <p className='text-4xl font-bold text-[#D99739]'>
+              {formatNumber(homeTeams)}
+            </p>
+            <p className='text-white/80 text-xs uppercase tracking-wider mt-1'>
+              {t.cumulative.homeTeams}
             </p>
           </div>
         </div>

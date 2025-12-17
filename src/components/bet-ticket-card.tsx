@@ -67,23 +67,23 @@ export function BetTicketCard({ ticket }: BetTicketCardProps) {
       {/* Prediction Display */}
       {placement && (
         <div className="flex items-center justify-center gap-6">
-          {/* Home Score */}
-          <div className="text-center flex-1">
-            <p className={`text-4xl font-bold ${isHomeLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
-              {placement.predictHomeScore}
-            </p>
-            <p className="text-text-muted text-xs uppercase tracking-wider mt-1">{t.cumulative.homeTeams}</p>
-          </div>
-
-          {/* Divider */}
-          <div className="text-3xl font-bold text-text-muted">:</div>
-
-          {/* Away Score */}
+          {/* Away Score (Left) */}
           <div className="text-center flex-1">
             <p className={`text-4xl font-bold ${isAwayLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
               {placement.predictAwayScore}
             </p>
             <p className="text-text-muted text-xs uppercase tracking-wider mt-1">{t.cumulative.awayTeams}</p>
+          </div>
+
+          {/* Divider */}
+          <div className="text-3xl font-bold text-text-muted">:</div>
+
+          {/* Home Score (Right) */}
+          <div className="text-center flex-1">
+            <p className={`text-4xl font-bold ${isHomeLucky ? 'text-[#D4A942] animate-pulse' : 'text-text-dark'}`}>
+              {placement.predictHomeScore}
+            </p>
+            <p className="text-text-muted text-xs uppercase tracking-wider mt-1">{t.cumulative.homeTeams}</p>
           </div>
         </div>
       )}

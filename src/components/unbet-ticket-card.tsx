@@ -109,11 +109,11 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                label={t.tickets.homeScore}
+                label={t.tickets.awayScore}
                 placeholder="0-1000"
-                value={homeScore}
-                onChange={(e) => setHomeScore(handleScoreChange(e.target.value))}
-                error={errors.home}
+                value={awayScore}
+                onChange={(e) => setAwayScore(handleScoreChange(e.target.value))}
+                error={errors.away}
               />
             </div>
             <div className="flex items-center justify-center pt-8 text-text-muted text-xl">:</div>
@@ -122,11 +122,11 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                label={t.tickets.awayScore}
+                label={t.tickets.homeScore}
                 placeholder="0-1000"
-                value={awayScore}
-                onChange={(e) => setAwayScore(handleScoreChange(e.target.value))}
-                error={errors.away}
+                value={homeScore}
+                onChange={(e) => setHomeScore(handleScoreChange(e.target.value))}
+                error={errors.home}
               />
             </div>
           </div>
