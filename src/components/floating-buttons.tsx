@@ -18,7 +18,7 @@ export function FloatingButtons() {
   const { openInfoModal, openRedeemModal } = useUIStore();
   const { setAddress, clearAddress, setHoopxBalance } = useWalletStore();
   const { t } = useTranslation();
-  const { isEventEnded } = useEventStatus();
+  const { isBettingClosed, isEventEnded } = useEventStatus();
   const [showMobileModal, setShowMobileModal] = useState(false);
 
   // Sync wallet connection state and fetch balance
@@ -80,8 +80,8 @@ export function FloatingButtons() {
         </svg>
       </button>
 
-      {/* Connect/Redeem Button - hide when event ended */}
-      {!isEventEnded && (
+      {/* Connect/Redeem Button - hide when betting closed or event ended */}
+      {!isBettingClosed && !isEventEnded && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40 max-w-[860px] mx-auto">
           <button
             onClick={handleButtonClick}
