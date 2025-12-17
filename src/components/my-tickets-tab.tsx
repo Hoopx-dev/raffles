@@ -107,18 +107,22 @@ export function MyTicketsTab() {
     );
   }
 
+  const isClosed = isBettingClosed || isEventEnded;
+
   // Error state
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
         <p className="text-red-400 text-center mb-4">Failed to load tickets</p>
-        <button
-          onClick={openRedeemModal}
-          className="flex items-center gap-2 text-[#D99739] font-medium cursor-pointer"
-        >
-          <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
-          {t.tickets.redeemFirst}
-        </button>
+        {!isClosed && (
+          <button
+            onClick={openRedeemModal}
+            className="flex items-center gap-2 text-[#D99739] font-medium cursor-pointer"
+          >
+            <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
+            {t.tickets.redeemFirst}
+          </button>
+        )}
       </div>
     );
   }
@@ -128,13 +132,15 @@ export function MyTicketsTab() {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
         <p className="text-white/60 text-center mb-4">{t.tickets.noTickets}</p>
-        <button
-          onClick={openRedeemModal}
-          className="flex items-center gap-2 text-[#D99739] font-medium cursor-pointer"
-        >
-          <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
-          {t.tickets.redeemFirst}
-        </button>
+        {!isClosed && (
+          <button
+            onClick={openRedeemModal}
+            className="flex items-center gap-2 text-[#D99739] font-medium cursor-pointer"
+          >
+            <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
+            {t.tickets.redeemFirst}
+          </button>
+        )}
       </div>
     );
   }
@@ -203,14 +209,16 @@ export function MyTicketsTab() {
         </div>
       )}
 
-      {/* Redeem More Button */}
-      <button
-        onClick={openRedeemModal}
-        className="flex items-center gap-2 mt-6 text-orange font-medium cursor-pointer"
-      >
-        <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
-        {t.tickets.redeemFirst}
-      </button>
+      {/* Redeem More Button - hide when event ended */}
+      {!isClosed && (
+        <button
+          onClick={openRedeemModal}
+          className="flex items-center gap-2 mt-6 text-orange font-medium cursor-pointer"
+        >
+          <span className="w-6 h-6 rounded-full bg-[#D99739] flex items-center justify-center text-white text-sm">+</span>
+          {t.tickets.redeemFirst}
+        </button>
+      )}
     </div>
   );
 }
