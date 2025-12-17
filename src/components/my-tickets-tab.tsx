@@ -46,8 +46,8 @@ export function MyTicketsTab() {
     ? 'PLACED'
     : 'ALL';
 
-  // Fetch tickets based on effective status
-  const { data: ticketData, isLoading: ticketsLoading, error } = useTicketList(effectiveStatus);
+  // Fetch tickets based on effective status (fetch all with large page size for client-side pagination)
+  const { data: ticketData, isLoading: ticketsLoading, error } = useTicketList(effectiveStatus, 1, 1000);
 
   const isLoading = countsLoading || ticketsLoading;
   // Filter out invalid tickets
