@@ -25,10 +25,10 @@ function convertGameInfo(game: GameInfo): ProcessedGame {
   // Parse Beijing time from API
   const gameDate = parseBeijingTime(game.gameTime);
 
-  // Use Beijing time for date key grouping (consistent with API)
-  const dateKey = gameDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });
+  // Use local timezone for date key grouping (so UK users see Dec 25/26 correctly)
+  const dateKey = gameDate.toLocaleDateString('en-CA');
 
-  // Display date and time in user's local timezone
+  // Display date in user's local timezone
   const date = gameDate.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
