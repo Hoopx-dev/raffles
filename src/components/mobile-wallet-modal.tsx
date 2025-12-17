@@ -3,7 +3,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { isInMobileBrowser, isInJupiterBrowser, isAndroidDevice, openInJupiterApp } from '@/lib/utils/mobile-deeplink';
+import { isInMobileBrowser, isInJupiterBrowser, isAndroidDevice, openInJupiterApp, openInPhantomApp, openInSolflareApp } from '@/lib/utils/mobile-deeplink';
 
 interface MobileWalletModalProps {
   isOpen: boolean;
@@ -61,6 +61,20 @@ export default function MobileWalletModal({ isOpen, onClose }: MobileWalletModal
       if (walletName === 'Jupiter Mobile' && isInMobileBrowser()) {
         onClose();
         openInJupiterApp();
+        return;
+      }
+
+      // Special handling for Phantom on Android - use deep link
+      if (walletName === 'Phantom' && isAndroid && isInMobileBrowser()) {
+        onClose();
+        openInPhantomApp();
+        return;
+      }
+
+      // Special handling for Solflare on Android - use deep link
+      if (walletName === 'Solflare' && isAndroid && isInMobileBrowser()) {
+        onClose();
+        openInSolflareApp();
         return;
       }
 

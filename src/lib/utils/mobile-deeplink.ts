@@ -74,6 +74,37 @@ export function buildUrlWithReferral(baseUrl: string, referralAddress?: string):
 }
 
 /**
+ * Open Phantom app on mobile with URL (Android deep link)
+ */
+export function openInPhantomApp(): void {
+  if (typeof window === 'undefined') return;
+
+  const currentUrl = encodeURIComponent(window.location.href);
+
+  // Phantom deep link format: https://phantom.app/ul/browse/{url}
+  // This works on both iOS and Android
+  const deepLink = `https://phantom.app/ul/browse/${currentUrl}`;
+
+  console.log('Phantom deep link:', deepLink);
+  window.location.href = deepLink;
+}
+
+/**
+ * Open Solflare app on mobile with URL (Android deep link)
+ */
+export function openInSolflareApp(): void {
+  if (typeof window === 'undefined') return;
+
+  const currentUrl = encodeURIComponent(window.location.href);
+
+  // Solflare deep link format
+  const deepLink = `https://solflare.com/ul/v1/browse/${currentUrl}`;
+
+  console.log('Solflare deep link:', deepLink);
+  window.location.href = deepLink;
+}
+
+/**
  * Open Jupiter app on mobile with URL
  */
 export function openInJupiterApp(referralAddress?: string): void {
