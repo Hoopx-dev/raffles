@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useWalletStore } from '@/lib/store/useWalletStore';
+import { useTabStore } from '@/lib/store/useTabStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useRedeemTicketsPre, useRedeemTickets } from '@/lib/hooks/useTickets';
 import { useEventStatus } from '@/lib/hooks/useHomeData';
@@ -30,6 +31,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   const { isConfirmModalOpen, closeConfirmModal, pendingRedeemAmount } = useUIStore();
   const { address } = useWalletStore();
+  const { setMainTab, setTicketSubTab } = useTabStore();
   const hoopxBalance = useWalletStore((s) => s.hoopxBalance);
   const setHoopxBalance = useWalletStore((s) => s.setHoopxBalance);
   const [error, setError] = useState<string | null>(null);
@@ -120,6 +122,9 @@ export function ConfirmModal({
             setHoopxBalance(hoopxBalance - totalCost);
             setStep('confirm');
             closeConfirmModal();
+            // Switch to My Tickets tab with unbet sub-tab
+            setMainTab('my-tickets');
+            setTicketSubTab('unbet');
             if (onSuccess) {
               onSuccess();
             }
