@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletStore } from '@/lib/store/useWalletStore';
-import { useTicketList } from './useTickets';
+import { useWalletStore } from "@/lib/store/useWalletStore";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useQuery } from "@tanstack/react-query";
+import { useTicketList } from "./useTickets";
 
 // ============================================
 // ELIGIBILITY CUTOFF DATE - Change this to adjust when swaps become eligible
@@ -11,19 +11,22 @@ import { useTicketList } from './useTickets';
 // Fixed to Beijing timezone (UTC+8) - Dec 17 00:00 Beijing = Dec 16 16:00 UTC
 // ============================================
 // Dec 17, 2025 00:00:00 Beijing time (UTC+8) = Dec 16, 2025 16:00:00 UTC
-const ELIGIBILITY_CUTOFF_DATE = '2025-12-16T16:00:00Z';
-const ELIGIBILITY_CUTOFF_TIMESTAMP = Math.floor(new Date(ELIGIBILITY_CUTOFF_DATE).getTime() / 1000);
+const ELIGIBILITY_CUTOFF_DATE = "2025-12-16T16:00:00Z";
+const ELIGIBILITY_CUTOFF_TIMESTAMP = Math.floor(
+  new Date(ELIGIBILITY_CUTOFF_DATE).getTime() / 1000
+);
 const ELIGIBILITY_CUTOFF_MS = new Date(ELIGIBILITY_CUTOFF_DATE).getTime();
 
 // Formatted date for display
-export const ELIGIBILITY_CUTOFF_DISPLAY = 'Dec 17 (Beijing)';
+export const ELIGIBILITY_CUTOFF_DISPLAY = "Dec 17 (Beijing)";
 
 // HOOPX token mint address
-const HOOPX_MINT = process.env.NEXT_PUBLIC_HOOPX_MINT || '11111111111111111111111111111111';
+const HOOPX_MINT =
+  process.env.NEXT_PUBLIC_HOOPX_MINT || "11111111111111111111111111111111";
 
 // Extract Helius API key from RPC URL
 function getHeliusApiKey(): string | null {
-  const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || '';
+  const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "";
   const match = rpcUrl.match(/api-key=([^&]+)/);
   return match ? match[1] : null;
 }
@@ -65,7 +68,10 @@ interface EligibleBalanceResult {
  * @param ticketPrice - Price per ticket in HOOPX (unused, kept for API compatibility)
  * @param enabled - Only fetch when true (e.g., when modal is open)
  */
-export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, enabled: boolean = true): EligibleBalanceResult {
+export function useEligibleBalance(
+  ticketPrice: number = DEFAULT_TICKET_PRICE,
+  enabled: boolean = true
+): EligibleBalanceResult {
   const { publicKey } = useWallet();
   const { isAuthenticated } = useWalletStore();
   const hoopxBalance = useWalletStore((s) => s.hoopxBalance);
@@ -74,27 +80,28 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
   const { data: ticketData } = useTicketList(undefined, 1, 100);
 
   // Count tickets created after the cutoff date
-  const ticketsAfterCutoff = ticketData?.records?.filter((ticket) => {
-    const ticketTime = new Date(ticket.createTime).getTime();
-    return ticketTime >= ELIGIBILITY_CUTOFF_MS;
-  }) || [];
+  const ticketsAfterCutoff =
+    ticketData?.records?.filter((ticket) => {
+      const ticketTime = new Date(ticket.createTime).getTime();
+      return ticketTime >= ELIGIBILITY_CUTOFF_MS;
+    }) || [];
   const ticketsRedeemedAfterCutoff = ticketsAfterCutoff.length;
   const hoopxUsedForTickets = ticketsRedeemedAfterCutoff * ticketPrice;
 
   const query = useQuery({
-    queryKey: ['swap-history-helius', publicKey?.toBase58()],
+    queryKey: ["swap-history-helius", publicKey?.toBase58()],
     queryFn: async () => {
-      if (!publicKey) throw new Error('Wallet not connected');
+      if (!publicKey) throw new Error("Wallet not connected");
 
       const apiKey = getHeliusApiKey();
-      if (!apiKey) throw new Error('Helius API key not found');
+      if (!apiKey) throw new Error("Helius API key not found");
 
       const walletAddress = publicKey.toBase58();
 
       // Call Helius Enhanced Transactions API - get ALL transactions (not just SWAP)
       // because recent swaps might be categorized differently
       const response = await fetch(
-        `https://api-mainnet.helius-rpc.com/v0/addresses/${walletAddress}/transactions?api-key=${apiKey}&limit=50`
+        `https://api-mainnet.helius-rpc.com/v0/addresses/${walletAddress}/transactions?api-key=${apiKey}&limit=100`
       );
 
       if (!response.ok) {
@@ -104,15 +111,20 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
       const transactions: HeliusTransaction[] = await response.json();
 
       // Debug: log all transactions
-      console.log('Helius transactions:', transactions.map(tx => ({
-        type: tx.type,
-        source: tx.source,
-        timestamp: new Date(tx.timestamp * 1000).toISOString(),
-        transfers: tx.tokenTransfers?.filter(t => t.mint === HOOPX_MINT).map(t => ({
-          amount: t.tokenAmount,
-          to: t.toUserAccount,
-        })),
-      })));
+      console.log(
+        "Helius transactions:",
+        transactions.map((tx) => ({
+          type: tx.type,
+          source: tx.source,
+          timestamp: new Date(tx.timestamp * 1000).toISOString(),
+          transfers: tx.tokenTransfers
+            ?.filter((t) => t.mint === HOOPX_MINT)
+            .map((t) => ({
+              amount: t.tokenAmount,
+              to: t.toUserAccount,
+            })),
+        }))
+      );
 
       // Sum up HOOPX received from SWAP transactions after cutoff date
       let totalSwapped = 0;
@@ -134,7 +146,7 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
         }
       }
 
-      console.log('Eligible HOOPX swapped (from SWAP only):', totalSwapped);
+      console.log("Eligible HOOPX swapped (from SWAP only):", totalSwapped);
 
       return { totalSwapped };
     },
@@ -149,11 +161,14 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
 
   const totalSwapped = query.data?.totalSwapped || 0;
   // Eligible = swapped after cutoff - tickets redeemed after cutoff
-  const eligibleAfterDeduction = Math.max(0, totalSwapped - hoopxUsedForTickets);
+  const eligibleAfterDeduction = Math.max(
+    0,
+    totalSwapped - hoopxUsedForTickets
+  );
   // Available is the minimum of: eligible amount OR what's in wallet
   const availableQuota = Math.min(eligibleAfterDeduction, hoopxBalance);
 
-  console.log('Eligible balance calc:', {
+  console.log("Eligible balance calc:", {
     totalSwapped,
     ticketsRedeemedAfterCutoff,
     hoopxUsedForTickets,
