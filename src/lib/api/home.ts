@@ -30,6 +30,8 @@ export interface GameInfo {
   awayScore: number;
   gameTime: string;
   status: 'UPCOMING' | 'LIVE' | 'FINAL';
+  currentPeriod: string; // e.g., "Q1", "Q2", "Q3", "Q4", "OT", "2OT"
+  timeRemaining: string; // e.g., "11:20"
 }
 
 export interface PrizePoolTier {

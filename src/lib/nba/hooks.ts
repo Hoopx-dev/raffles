@@ -64,6 +64,8 @@ function convertGameInfo(game: GameInfo): ProcessedGame {
       score: game.awayScore || 0,
       logo: game.awayLogo || getTeamLogo(awayKey),
     },
+    quarter: game.currentPeriod || undefined,
+    timeRemaining: game.timeRemaining || undefined,
     startTime: statusMap[game.status] === 'upcoming'
       ? gameDate.toLocaleTimeString('en-US', {
           hour: 'numeric',
