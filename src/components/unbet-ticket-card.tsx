@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTabStore } from '@/lib/store/useTabStore';
+import { useDraftScoreStore } from '@/lib/store/useDraftScoreStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useEventStatus } from '@/lib/hooks/useHomeData';
 import { usePlaceTicket, UserTicket } from '@/lib/hooks/useTickets';
@@ -16,8 +17,16 @@ interface UnbetTicketCardProps {
 }
 
 export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
-  const [homeScore, setHomeScore] = useState('');
-  const [awayScore, setAwayScore] = useState('');
+  // Use persisted draft scores from store
+  const draft = useDraftScoreStore((s) => s.getDraft(ticket.id));
+  const setDraft = useDraftScoreStore((s) => s.setDraft);
+  const clearDraft = useDraftScoreStore((s) => s.clearDraft);
+
+  const homeScore = draft?.homeScore || '';
+  const awayScore = draft?.awayScore || '';
+  const setHomeScore = (value: string) => setDraft(ticket.id, value, awayScore);
+  const setAwayScore = (value: string) => setDraft(ticket.id, homeScore, value);
+
   const [errors, setErrors] = useState<{ home?: string; away?: string }>({});
   const { t } = useTranslation();
   const { isBettingClosed, isEventEnded } = useEventStatus();
@@ -71,6 +80,8 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
       {
         onSuccess: (result) => {
           console.log('Place ticket result:', result);
+          // Clear draft for this ticket
+          clearDraft(ticket.id);
           showToast('Prediction placed successfully!', 'success');
           setTicketSubTab('bet');
           // Show lucky number modal if hit lucky egg
