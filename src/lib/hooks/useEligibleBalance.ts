@@ -121,38 +121,6 @@ export function useEligibleBalance(ticketPrice: number = DEFAULT_TICKET_PRICE, e
         // Skip transactions before cutoff date
         if (tx.timestamp < ELIGIBILITY_CUTOFF_TIMESTAMP) continue;
 
-        // Only count DEX swap transactions from known sources
-        // Jupiter aggregates through many DEXes/routers
-        const DEX_SOURCES = [
-          'JUPITER',
-          'RAYDIUM',
-          'ORCA',
-          'METEORA',
-          'PHOENIX',
-          'OKX_DEX_ROUTER',
-          'DFLOW',
-          'OPENBOOK',
-          'WHIRLPOOL',
-          'LIFINITY',
-          'ALDRIN',
-          'CREMA',
-          'SABER',
-          'MERCURIAL',
-          'MARINADE',
-          'SANCTUM',
-          'FLUXBEAM',
-          'GOOSEFX',
-          'CROPPER',
-          'STEP',
-          'SENTRE',
-          'SAROS',
-          'INVARIANT',
-          'OBRIC',
-        ];
-        if (!DEX_SOURCES.includes(tx.source)) {
-          continue;
-        }
-
         // Check token transfers for HOOPX received
         for (const transfer of tx.tokenTransfers || []) {
           // Check if this is HOOPX being received by our wallet
