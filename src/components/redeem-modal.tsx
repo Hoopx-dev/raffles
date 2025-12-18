@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useWalletStore } from '@/lib/store/useWalletStore';
 import { useUIStore } from '@/lib/store/useUIStore';
 import { useTranslation } from '@/i18n/useTranslation';
-import { useEligibleBalance, ELIGIBILITY_CUTOFF_DISPLAY } from '@/lib/hooks/useEligibleBalance';
+import { useEligibleBalance } from '@/lib/hooks/useEligibleBalance';
 import { getHoopxBalance } from '@/lib/solana/burnTokens';
 import { Modal } from './ui/modal';
 import { Button } from './ui/button';
@@ -57,8 +57,7 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
           console.error('Failed to refresh HOOPX balance:', error);
         });
 
-      // Invalidate eligible balance query to force refetch
-      queryClient.invalidateQueries({ queryKey: ['swap-history-helius', publicKey.toBase58()] });
+      // Invalidate tickets query
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
 
       // Clear refreshing state after a short delay
@@ -75,7 +74,7 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
     if (isLoadingSwaps) return null;
 
     if (availableQuota === 0) {
-      return `No eligible HOOPX. Only newly swapped HOOPX after ${ELIGIBILITY_CUTOFF_DISPLAY} can be redeemed.`;
+      return 'No HOOPX in wallet. Swap some HOOPX to redeem tickets.';
     }
     if (availableQuota < totalCost) {
       return `Insufficient eligible balance. Available: ${formatNumber(availableQuota)} HOOPX`;
