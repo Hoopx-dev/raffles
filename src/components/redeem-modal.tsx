@@ -105,12 +105,6 @@ export function RedeemModal({ ticketPrice = DEFAULT_TICKET_PRICE }: RedeemModalP
             <span className="text-text-dark font-medium">{formatNumber(hoopxBalance)} HOOPX</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-muted">Available to Redeem</span>
-            <span className={`font-medium ${availableQuota > 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {isLoadingSwaps || isRefreshing ? '...' : `${formatNumber(availableQuota)} HOOPX`}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm">
             <span className="text-text-muted">Price per ticket</span>
             <span className="text-text-dark font-medium">{formatNumber(ticketPrice)} HOOPX</span>
           </div>
