@@ -1,9 +1,32 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ProcessedGame } from '@/lib/nba/types';
 import { Badge } from './ui/badge';
 import { useTranslation } from '@/i18n/useTranslation';
+
+/**
+ * Parse time string "MM:SS" to total seconds
+ */
+function parseTimeToSeconds(time: string): number {
+  const parts = time.split(':');
+  if (parts.length === 2) {
+    const minutes = parseInt(parts[0], 10) || 0;
+    const seconds = parseInt(parts[1], 10) || 0;
+    return minutes * 60 + seconds;
+  }
+  return 0;
+}
+
+/**
+ * Format seconds to "MM:SS" string
+ */
+function formatSecondsToTime(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
 
 interface GameCardProps {
   game: ProcessedGame;
@@ -12,6 +35,33 @@ interface GameCardProps {
 export function GameCard({ game }: GameCardProps) {
   const { homeTeam, awayTeam, status, quarter, timeRemaining, startTime } = game;
   const { t } = useTranslation();
+
+  // Countdown timer state
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(() =>
+    timeRemaining ? parseTimeToSeconds(timeRemaining) : 0
+  );
+
+  // Sync with API when timeRemaining changes
+  useEffect(() => {
+    if (timeRemaining) {
+      setRemainingSeconds(parseTimeToSeconds(timeRemaining));
+    }
+  }, [timeRemaining]);
+
+  // Countdown effect for live games
+  useEffect(() => {
+    if (status !== 'live' || remainingSeconds <= 0) return;
+
+    const interval = setInterval(() => {
+      setRemainingSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [status, remainingSeconds > 0]);
+
+  const displayTime = status === 'live' && remainingSeconds > 0
+    ? formatSecondsToTime(remainingSeconds)
+    : timeRemaining;
 
   // Different background colors based on game status
   const cardBgColor = status === 'live'
@@ -37,7 +87,7 @@ export function GameCard({ game }: GameCardProps) {
         {status === 'live' && quarter && (
           <span className="text-[#183824] text-sm mt-1">
             {quarter}
-            {timeRemaining && <span className="ml-1">{timeRemaining}</span>}
+            {displayTime && <span className="ml-1">{displayTime}</span>}
           </span>
         )}
         {status === 'upcoming' && startTime && (
