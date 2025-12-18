@@ -84,7 +84,7 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({
       metadata: {
         name: "NBA Christmas 2025 Raffle",
         description:
-          "Score Prediction Challenge - Predict NBA Christmas Day scores and win prizes!",
+          "Christmas Game Prediction - Predict NBA Christmas Day scores and win prizes!",
         url:
           typeof window !== "undefined"
             ? window.location.origin

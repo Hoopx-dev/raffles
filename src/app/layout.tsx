@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "HoopXmas Raffle Ticket",
-  description: "Predict NBA Christmas Day scores and win up to 200,000 USDT! Join the HoopX Score Prediction Challenge.",
+  description: "Predict NBA Christmas Day scores and win up to 200,000 USDT! Join the HoopX Christmas Game Prediction.",
   keywords: ["NBA", "Christmas", "Basketball", "Prediction", "HoopX", "Solana", "Crypto"],
   themeColor: "#91000A",
   openGraph: {
