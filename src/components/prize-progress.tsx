@@ -54,7 +54,7 @@ export function PrizeProgress({ currentTickets, nextTierTickets, nextTierPrize, 
         <span className="text-white/60">
           {formatNumber(currentTickets)} / {formatNumber(nextTierTickets)} {t.progress.tickets}
         </span>
-        <span className="text-white/80 font-medium">{Math.round(progress)}%</span>
+        <span className="text-white/80 font-medium">{progress < 1 && progress > 0 ? progress.toFixed(1) : Math.round(progress)}%</span>
       </div>
     </div>
   );
