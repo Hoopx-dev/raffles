@@ -34,10 +34,9 @@ export function GameCard({ game }: GameCardProps) {
             {status === 'upcoming' ? t.games.upcoming : t.games.final}
           </Badge>
         )}
-        {status === 'live' && quarter && (
+        {status === 'live' && (quarter || timeRemaining) && (
           <span className="text-[#183824] text-sm mt-1">
-            {quarter}
-            {timeRemaining && <span className="ml-1">{timeRemaining}</span>}
+            {timeRemaining || quarter}
           </span>
         )}
         {status === 'upcoming' && startTime && (
