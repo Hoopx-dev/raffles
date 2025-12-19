@@ -38,24 +38,24 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
 
   const validateScore = (value: string): boolean => {
     const num = parseInt(value, 10);
-    return !isNaN(num) && num >= 0 && num <= 2000;
+    return !isNaN(num) && num >= 0 && num <= 1000;
   };
 
   const handleScoreChange = (value: string): string => {
     const numericOnly = value.replace(/[^0-9]/g, '');
     if (!numericOnly) return '';
     const num = parseInt(numericOnly, 10);
-    return num > 2000 ? '2000' : numericOnly;
+    return num > 1000 ? '1000' : numericOnly;
   };
 
   const handleSubmit = () => {
     const newErrors: { home?: string; away?: string } = {};
 
     if (!homeScore || !validateScore(homeScore)) {
-      newErrors.home = 'Enter 0-2000';
+      newErrors.home = 'Enter 0-1000';
     }
     if (!awayScore || !validateScore(awayScore)) {
-      newErrors.away = 'Enter 0-2000';
+      newErrors.away = 'Enter 0-1000';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -121,7 +121,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 label={t.tickets.awayScore}
-                placeholder="0-2000"
+                placeholder="0-1000"
                 value={awayScore}
                 onChange={(e) => setAwayScore(handleScoreChange(e.target.value))}
                 error={errors.away}
@@ -134,7 +134,7 @@ export function UnbetTicketCard({ ticket, eventId = 1 }: UnbetTicketCardProps) {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 label={t.tickets.homeScore}
-                placeholder="0-2000"
+                placeholder="0-1000"
                 value={homeScore}
                 onChange={(e) => setHomeScore(handleScoreChange(e.target.value))}
                 error={errors.home}
